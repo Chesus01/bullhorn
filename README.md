@@ -62,11 +62,11 @@ Netlify, Vercel, GitHub Pages, etc. Uses hash routing so no server config needed
 
 Search the code for these placeholders:
 
-- **Solana wallet adapter** → `src/components/Placeholders.jsx` (`WalletConnectPlaceholder`).
-  Swap for `@solana/wallet-adapter-react` + `signMessage()`. Verification message text is in
-  `src/utils.js` (`VERIFICATION_MESSAGE`).
-- **Token holder check** → after signature, read token accounts via RPC and check for the
-  Black Bull / ANSEM mint; add `ANSEM Holder Verified` badge.
+- ✅ **Solana wallet adapter — done.** `src/components/SolanaWalletConnect.jsx` + `src/context/SolanaWalletProvider.jsx`.
+  Real connect (Phantom/Solflare explicit, others via Wallet Standard auto-detect) + `signMessage()`
+  ownership proof + live `$ANSEM` token-account check (mint in `src/config.js`). Read-only —
+  connect and sign only, never a transaction. Needs Buffer polyfill in `src/main.jsx` to work
+  with Solana web3.js under Vite (`window.Buffer = Buffer`) — don't remove it.
 - **Captcha** → `CaptchaPlaceholder` in the same file.
 - **AI fraud review** → `suggestedAction()` in `src/pages/Admin.jsx` is a rule-based mock.
   Fraud-risk language only — never "deserving" language.
