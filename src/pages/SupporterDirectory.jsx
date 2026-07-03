@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import SupporterCard from '../components/SupporterCard'
-import { BullBackdrop } from '../components/BullArt'
+import { SceneBackdrop } from '../components/BullArt'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 export default function SupporterDirectory() {
@@ -11,7 +11,7 @@ export default function SupporterDirectory() {
 
   return (
     <div className="container">
-      <BullBackdrop side="right" opacity={0.1} size={440} />
+      <SceneBackdrop src="/scene-supporters.jpg" side="right" opacity={0.35} />
       <div className="page-head">
         <h1>Supporter <span className="green">Directory</span>.</h1>
         <p>

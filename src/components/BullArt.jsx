@@ -119,6 +119,17 @@ export function BullBackdrop({ side = 'right', opacity = 0.12, size = 460 }) {
   )
 }
 
+// Full atmospheric bull scene (storm/smoke/cracked-earth renders) used as a
+// large faded-edge backdrop on key pages — distinct from BullBackdrop, which
+// is the small transparent logo cutout used everywhere else.
+export function SceneBackdrop({ src, side = 'right', opacity = 0.18 }) {
+  return (
+    <div className={`scene-backdrop ${side}`} style={{ opacity }}>
+      <img src={src} alt="" aria-hidden="true" />
+    </div>
+  )
+}
+
 // Faint candlestick chart lines for background texture.
 export function ChartLines({ opacity = 0.1, width = 420, height = 160, style }) {
   const candles = [

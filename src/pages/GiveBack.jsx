@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import StoryCard from '../components/StoryCard'
 import DisclaimerBox from '../components/DisclaimerBox'
-import { BullBackdrop } from '../components/BullArt'
+import { SceneBackdrop } from '../components/BullArt'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const SECTIONS = [
@@ -31,7 +31,7 @@ export default function GiveBack() {
 
   return (
     <div className="container">
-      <BullBackdrop side="left" opacity={0.12} size={480} />
+      <SceneBackdrop src="/scene-giveback.jpg" side="left" opacity={0.35} />
       <div className="page-head">
         <h1>Ansem should not have to carry <span className="green">the whole weight</span>.</h1>
         <p>

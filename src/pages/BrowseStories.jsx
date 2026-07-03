@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext'
 import StoryCard from '../components/StoryCard'
 import FilterMenu from '../components/FilterMenu'
 import SearchBar from '../components/SearchBar'
-import { BullBackdrop, ChartLines } from '../components/BullArt'
+import { SceneBackdrop, ChartLines } from '../components/BullArt'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const TABS = [
@@ -51,7 +51,7 @@ export default function BrowseStories() {
 
   return (
     <div className="container">
-      <BullBackdrop side="right" opacity={0.1} size={420} />
+      <SceneBackdrop src="/scene-browse.jpg" side="right" opacity={0.35} />
       <ChartLines opacity={0.06} style={{ top: 30, right: '8%' }} />
       <div className="page-head">
         <h1>Browse <span className="green">real stories</span>.</h1>

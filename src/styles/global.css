@@ -118,6 +118,22 @@ input, select, textarea { font-family: inherit; }
   inset: -40px -30px auto auto;
 }
 
+/* Large atmospheric scene renders (storm/smoke/cracked-earth) — faded at the
+   edges so they blend into the page instead of showing a hard rectangle. */
+.scene-backdrop {
+  position: absolute;
+  top: -20px;
+  width: min(640px, 60vw);
+  height: 560px;
+  z-index: 0;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at center, black 35%, transparent 78%);
+  mask-image: radial-gradient(ellipse 60% 55% at center, black 35%, transparent 78%);
+}
+.scene-backdrop.right { right: -10%; }
+.scene-backdrop.left { left: -10%; }
+.scene-backdrop img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+
 /* Glow pulse via opacity only — animating `filter` on large SVGs is too expensive */
 @keyframes hornPulse {
   0%, 100% { opacity: 0.82; }
