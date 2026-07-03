@@ -1,3 +1,7 @@
+import { Buffer } from 'buffer'
+// Solana web3.js expects Node's Buffer global — polyfill it for the browser.
+window.Buffer = window.Buffer || Buffer
+
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'

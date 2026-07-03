@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { looksLikeSolanaAddress } from '../utils'
 import DisclaimerBox from '../components/DisclaimerBox'
-import { CaptchaPlaceholder, WalletConnectPlaceholder, XConnectPlaceholder } from '../components/Placeholders'
+import { CaptchaPlaceholder, XConnectPlaceholder } from '../components/Placeholders'
+import SolanaWalletConnect from '../components/SolanaWalletConnect'
 import { TokenText } from '../components/TokenText'
 import { usePageTitle } from '../hooks/usePageTitle'
 
@@ -31,6 +32,7 @@ export default function BecomeSupporter() {
   const [form, setForm] = useState(initialForm)
   const [errors, setErrors] = useState({})
   const [submitted, setSubmitted] = useState(false)
+  const [walletVerified, setWalletVerified] = useState(false)
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }))
   const toggle = (k, opt) =>
@@ -61,8 +63,11 @@ export default function BecomeSupporter() {
         supportMethods: form.methods,
         pledgeRange: form.pledgeRange || 'Prefer not to say',
         message: form.message.trim(),
-        badges: ['Community Supporter', ...(anonymous ? ['Anonymous Donor'] : [])],
-        verifiedSupporter: false,
+        badges: [
+          ...(walletVerified ? ['Verified Supporter'] : ['Community Supporter']),
+          ...(anonymous ? ['Anonymous Donor'] : []),
+        ],
+        verifiedSupporter: walletVerified,
         anonymous,
         storiesSupported: 0,
         createdAt: new Date().toISOString().slice(0, 10),
@@ -182,7 +187,9 @@ export default function BecomeSupporter() {
             <textarea value={form.message} onChange={(e) => set('message', e.target.value)} style={{ minHeight: 90 }} placeholder="Why do you want to give back? Who are you hoping to find?" />
           ))}
 
-          <WalletConnectPlaceholder walletAddress={looksLikeSolanaAddress(form.walletAddress) ? form.walletAddress : null} />
+          <SolanaWalletConnect
+            onVerified={({ publicKey }) => { setWalletVerified(true); set('walletAddress', publicKey) }}
+          />
 
           <div>
             <CaptchaPlaceholder checked={form.captcha} onChange={(v) => set('captcha', v)} />

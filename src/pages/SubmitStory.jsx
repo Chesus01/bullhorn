@@ -4,7 +4,8 @@ import { useApp } from '../context/AppContext'
 import { CATEGORIES, CREATED_OPTIONS } from '../data/mockData'
 import { looksLikeSolanaAddress } from '../utils'
 import DisclaimerBox from '../components/DisclaimerBox'
-import { CaptchaPlaceholder, WalletConnectPlaceholder, XConnectPlaceholder } from '../components/Placeholders'
+import { CaptchaPlaceholder, XConnectPlaceholder } from '../components/Placeholders'
+import SolanaWalletConnect from '../components/SolanaWalletConnect'
 import { TokenText } from '../components/TokenText'
 import { usePageTitle } from '../hooks/usePageTitle'
 
@@ -35,6 +36,7 @@ export default function SubmitStory() {
   const [form, setForm] = useState(initialForm)
   const [errors, setErrors] = useState({})
   const [walletVerified, setWalletVerified] = useState(false)
+  const [ansemHolderVerified, setAnsemHolderVerified] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
   const set = (key, value) => setForm((f) => ({ ...f, [key]: value }))
@@ -66,6 +68,7 @@ export default function SubmitStory() {
     }
     const badges = ['Wallet Submitted']
     if (walletVerified) badges.push('Wallet Verified', 'Wallet Ownership Signed')
+    if (ansemHolderVerified) badges.push('$ANSEM Holder Verified')
     addStory({
       title: form.title.trim(),
       alias: form.alias.trim(),
@@ -89,7 +92,7 @@ export default function SubmitStory() {
       storyQualitySignal: 0,
       communityVouchSignal: 0,
       humanConfidence: 0,
-      ansemHolder: form.holder === 'Yes',
+      ansemHolder: form.holder === 'Yes' || ansemHolderVerified,
       walletVerified,
       walletSigned: walletVerified,
       createdAt: new Date().toISOString().slice(0, 10),
@@ -167,9 +170,9 @@ export default function SubmitStory() {
             <input value={form.walletAddress} onChange={(e) => set('walletAddress', e.target.value)} placeholder="Your public Solana wallet address" style={{ fontFamily: 'monospace' }} />
           ), 'Public address only. Never share your seed phrase or private key with anyone.')}
 
-          <WalletConnectPlaceholder
-            walletAddress={looksLikeSolanaAddress(form.walletAddress) ? form.walletAddress : null}
-            onVerified={() => setWalletVerified(true)}
+          <SolanaWalletConnect
+            onVerified={({ publicKey }) => { setWalletVerified(true); set('walletAddress', publicKey) }}
+            onHolderChecked={setAnsemHolderVerified}
           />
 
           {field('title', 'Story title *', (

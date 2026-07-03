@@ -1,6 +1,7 @@
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { AppProvider } from './context/AppContext'
+import SolanaWalletProvider from './context/SolanaWalletProvider'
 import Navbar from './components/Navbar'
 import PriceTicker from './components/PriceTicker'
 import Footer from './components/Footer'
@@ -27,6 +28,7 @@ function ScrollToTop() {
 
 export default function App() {
   return (
+    <SolanaWalletProvider>
     <AppProvider>
       <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <ScrollToTop />
@@ -53,5 +55,6 @@ export default function App() {
         <Toasts />
       </HashRouter>
     </AppProvider>
+    </SolanaWalletProvider>
   )
 }
