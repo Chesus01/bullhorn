@@ -24,6 +24,39 @@ export function restoreFormSnapshot(page) {
   }
 }
 
+// Compact version for the navbar (top-right, every page) — same real OAuth
+// session, just no form to snapshot/restore. Lets people connect X once from
+// anywhere on the site; forms pick up the same verified session automatically.
+export function XNavButton() {
+  const [handle, setHandle] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const meta = session?.user?.user_metadata
+      const userName = meta?.user_name || meta?.preferred_username
+      if (userName) setHandle(`@${userName}`)
+      setLoading(false)
+    })
+  }, [])
+
+  const connect = () => {
+    supabase.auth.signInWithOAuth({ provider: 'x', options: { redirectTo: window.location.href } })
+  }
+
+  if (loading) return null
+
+  return handle ? (
+    <span className="giving-list-pill" title="X account verified">
+      𝕏 {handle}
+    </span>
+  ) : (
+    <button type="button" className="btn btn-outline btn-sm" onClick={connect}>
+      𝕏 Connect X
+    </button>
+  )
+}
+
 export default function XConnect({ onVerified, formSnapshot, page }) {
   const [handle, setHandle] = useState(null)
   const [loading, setLoading] = useState(true)

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { BullImage } from './BullArt'
+import { XNavButton } from './XConnect'
 
 const LINKS = [
   { to: '/guide', label: 'Guide' },
@@ -49,6 +50,7 @@ export default function Navbar() {
             <span>🎁</span>
             <span className="giving-list-count">{givingList.length}</span>
           </Link>
+          <XNavButton />
           <Link to="/submit" className="btn btn-primary btn-sm nav-cta">
             Submit Your Story
           </Link>
