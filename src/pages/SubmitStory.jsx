@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { CATEGORIES, CREATED_OPTIONS } from '../data/mockData'
 import { looksLikeSolanaAddress } from '../utils'
 import DisclaimerBox from '../components/DisclaimerBox'
-import { CaptchaPlaceholder, XConnectPlaceholder } from '../components/Placeholders'
+import { CaptchaPlaceholder } from '../components/Placeholders'
+import XConnect, { restoreFormSnapshot } from '../components/XConnect'
 import SolanaWalletConnect from '../components/SolanaWalletConnect'
 import { TokenText } from '../components/TokenText'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -38,6 +39,11 @@ export default function SubmitStory() {
   const [walletVerified, setWalletVerified] = useState(false)
   const [ansemHolderVerified, setAnsemHolderVerified] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() => {
+    const restored = restoreFormSnapshot('submit')
+    if (restored) setForm((f) => ({ ...f, ...restored }))
+  }, [])
 
   const set = (key, value) => setForm((f) => ({ ...f, [key]: value }))
   const toggleCreated = (opt) =>
@@ -164,7 +170,9 @@ export default function SubmitStory() {
             <input value={form.xHandle} onChange={(e) => set('xHandle', e.target.value)} placeholder="@yourhandle" />
           ), 'Optional, but it helps supporters verify you are real.')}
 
-          {form.xHandle.trim() && <XConnectPlaceholder xHandle={form.xHandle.trim()} />}
+          {form.xHandle.trim() && (
+            <XConnect page="submit" formSnapshot={form} onVerified={(h) => set('xHandle', h)} />
+          )}
 
           {field('walletAddress', 'Solana wallet address *', (
             <input value={form.walletAddress} onChange={(e) => set('walletAddress', e.target.value)} placeholder="Your public Solana wallet address" style={{ fontFamily: 'monospace' }} />

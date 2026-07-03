@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { looksLikeSolanaAddress } from '../utils'
 import DisclaimerBox from '../components/DisclaimerBox'
-import { CaptchaPlaceholder, XConnectPlaceholder } from '../components/Placeholders'
+import { CaptchaPlaceholder } from '../components/Placeholders'
+import XConnect, { restoreFormSnapshot } from '../components/XConnect'
 import SolanaWalletConnect from '../components/SolanaWalletConnect'
 import { TokenText } from '../components/TokenText'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -33,6 +34,11 @@ export default function BecomeSupporter() {
   const [errors, setErrors] = useState({})
   const [submitted, setSubmitted] = useState(false)
   const [walletVerified, setWalletVerified] = useState(false)
+
+  useEffect(() => {
+    const restored = restoreFormSnapshot('become-supporter')
+    if (restored) setForm((f) => ({ ...f, ...restored }))
+  }, [])
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }))
   const toggle = (k, opt) =>
@@ -134,7 +140,9 @@ export default function BecomeSupporter() {
             <input value={form.xHandle} onChange={(e) => set('xHandle', e.target.value)} placeholder="@yourhandle" />
           ), 'Verifying your handle makes your supporter profile far more credible to the community and partners.')}
 
-          {form.xHandle.trim() && <XConnectPlaceholder xHandle={form.xHandle.trim()} />}
+          {form.xHandle.trim() && (
+            <XConnect page="become-supporter" formSnapshot={form} onVerified={(h) => set('xHandle', h)} />
+          )}
 
           {field('walletAddress', 'Solana wallet address', (
             <input value={form.walletAddress} onChange={(e) => set('walletAddress', e.target.value)} placeholder="Optional — used for verification only, never listed publicly" style={{ fontFamily: 'monospace' }} />
