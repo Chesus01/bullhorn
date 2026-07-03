@@ -1,7 +1,8 @@
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { AppProvider } from './context/AppContext'
 import SolanaWalletProvider from './context/SolanaWalletProvider'
+import IntroVideo from './components/IntroVideo'
 import Navbar from './components/Navbar'
 import PriceTicker from './components/PriceTicker'
 import Footer from './components/Footer'
@@ -27,9 +28,19 @@ function ScrollToTop() {
 }
 
 export default function App() {
+  // Only splash on a fresh landing at the root — deep links people share
+  // (like a story link on X) should open straight to the content, and it
+  // only plays once per browser session, not on every internal navigation.
+  const [showIntro, setShowIntro] = useState(() => {
+    const hash = window.location.hash.replace('#', '')
+    const isRoot = hash === '' || hash === '/'
+    return isRoot && !sessionStorage.getItem('bullhorn_intro_seen')
+  })
+
   return (
     <SolanaWalletProvider>
     <AppProvider>
+      {showIntro && <IntroVideo onDone={() => setShowIntro(false)} />}
       <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <ScrollToTop />
         <PriceTicker />

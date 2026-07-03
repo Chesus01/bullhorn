@@ -93,6 +93,10 @@ export default function SolanaWalletConnect({ onVerified, onHolderChecked }) {
         site cannot move your funds, request approvals, or access your seed phrase. Works with
         Phantom, Solflare, Backpack, Magic Eden Wallet, and other standard Solana wallets.
       </p>
+      <p className="small muted" style={{ marginBottom: 14 }}>
+        Want a deeper holder verification? Check your $ANSEM standing on{' '}
+        <a href="https://bullpen.fi/@chesus" target="_blank" rel="noreferrer" className="green">Bullpen ↗</a>.
+      </p>
 
       {error && (
         <div className="notice danger small" style={{ marginBottom: 12 }}>
