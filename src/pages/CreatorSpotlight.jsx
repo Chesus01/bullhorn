@@ -5,7 +5,7 @@ import { CREATED_OPTIONS } from '../data/mockData'
 import { spotlightScore, shortWallet, copyText, shareOnXUrl } from '../utils'
 import FilterMenu from '../components/FilterMenu'
 import { BadgeRow } from '../components/Badge'
-import { BullBackdrop } from '../components/BullArt'
+import { SceneBackdrop } from '../components/BullArt'
 import { TokenText } from '../components/TokenText'
 import DisclaimerBox from '../components/DisclaimerBox'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -80,7 +80,7 @@ export default function CreatorSpotlight() {
 
   return (
     <div className="container">
-      <BullBackdrop side="left" opacity={0.1} size={440} />
+      <SceneBackdrop src="/scene-supporters.jpg" side="left" opacity={0.3} />
       <div className="page-head">
         <h1>Creator & builder <span className="green">spotlight</span>.</h1>
         <p>

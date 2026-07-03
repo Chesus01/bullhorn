@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
-import { BullBackdrop } from '../components/BullArt'
+import { SceneBackdrop } from '../components/BullArt'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 export default function NotFound() {
   usePageTitle('Page Not Found')
   return (
     <div className="container section" style={{ minHeight: '50vh', display: 'flex', alignItems: 'center' }}>
-      <BullBackdrop side="right" opacity={0.12} size={420} />
+      <SceneBackdrop src="/scene-giveback.jpg" side="right" opacity={0.3} />
       <div className="empty-state" style={{ margin: '0 auto', maxWidth: 480 }}>
         <div className="icon">🐂</div>
         <h1 style={{ fontSize: '1.6rem', marginBottom: 10 }}>This page wandered off the trail.</h1>

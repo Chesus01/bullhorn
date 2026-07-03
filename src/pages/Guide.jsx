@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { BullBackdrop } from '../components/BullArt'
+import { SceneBackdrop } from '../components/BullArt'
 import DisclaimerBox from '../components/DisclaimerBox'
 import { usePageTitle } from '../hooks/usePageTitle'
 
@@ -32,7 +32,7 @@ export default function Guide() {
   usePageTitle('How It Works')
   return (
     <div className="container">
-      <BullBackdrop side="right" opacity={0.1} size={420} />
+      <SceneBackdrop src="/scene-browse.jpg" side="right" opacity={0.3} />
       <div className="page-head">
         <h1>How to use <span className="green">Bullhorn</span>.</h1>
         <p>

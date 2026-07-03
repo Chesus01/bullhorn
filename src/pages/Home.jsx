@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import StoryCard from '../components/StoryCard'
 import { BadgeRow } from '../components/Badge'
-import { BullImage, ChartLines } from '../components/BullArt'
+import { ChartLines } from '../components/BullArt'
 import { Ansem, TokenText } from '../components/TokenText'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { shortWallet, copyText } from '../utils'
@@ -101,8 +101,14 @@ export default function Home() {
             </p>
           </div>
           <div className="hero-card-wrap">
-            <span className="hero-bull" style={{ opacity: 0.35 }}>
-              <BullImage height={400} className="horn-pulse" />
+            <span className="hero-bull" style={{ opacity: 0.4 }}>
+              <img
+                src="/scene-supporters.jpg"
+                alt=""
+                aria-hidden="true"
+                className="horn-pulse"
+                style={{ height: 440, width: 340, objectFit: 'cover', objectPosition: 'center 25%', borderRadius: 20 }}
+              />
             </span>
             <div className="float-slow" style={{ position: 'relative', zIndex: 1 }}>
               <HeroPreviewCard />
