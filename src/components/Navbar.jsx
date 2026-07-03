@@ -37,6 +37,14 @@ export default function Navbar() {
         </nav>
 
         <div className="nav-actions">
+          <a
+            href="https://bullpen.fi/@chesus"
+            target="_blank"
+            rel="noreferrer"
+            className="btn btn-primary btn-sm nav-cta"
+          >
+            Bullpen ↗
+          </a>
           <Link to="/giving-list" className="giving-list-pill" title="Your Giving List">
             <span>🎁</span>
             <span className="giving-list-count">{givingList.length}</span>
@@ -70,6 +78,9 @@ export default function Navbar() {
           <NavLink to="/giving-list" onClick={() => setOpen(false)}>
             Giving List ({givingList.length})
           </NavLink>
+          <a href="https://bullpen.fi/@chesus" target="_blank" rel="noreferrer" className="btn btn-primary" onClick={() => setOpen(false)}>
+            Bullpen ↗
+          </a>
           <Link to="/submit" className="btn btn-primary" onClick={() => setOpen(false)}>
             Submit Your Story
           </Link>
