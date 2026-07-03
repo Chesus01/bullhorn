@@ -84,7 +84,7 @@ export function looksLikeSolanaAddress(addr) {
 // Share a story to the X timeline via the web intent — no login or API needed.
 export function shareOnXUrl(story) {
   const url = `${window.location.origin}${window.location.pathname}#/story/${story.id}`
-  const text = `Real story from the Black Bull community 🐂\n\n"${story.title}"\n\nVerify the wallet and give directly — no middleman:\n${url}`
+  const text = `Bullhorn 🐂 — verified wallets, real stories, direct giving. No bots, no middleman, no custody.\n\n"${story.title}"\n\n${url}\n\nWhat's your story?`
   return `https://x.com/intent/post?text=${encodeURIComponent(text)}`
 }
 
