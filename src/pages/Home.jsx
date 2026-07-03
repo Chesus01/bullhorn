@@ -11,6 +11,21 @@ function HeroPreviewCard() {
   const { stories, toast, addToGivingList, inGivingList } = useApp()
   const featured = stories.find((s) => s.featured && s.status === 'approved') || stories[0]
 
+  if (!featured) {
+    return (
+      <div className="card card-elevated card-glow story-card">
+        <span className="eyebrow" style={{ marginBottom: 4, alignSelf: 'flex-start' }}>🐮 Be the first</span>
+        <h3>Real stories start here.</h3>
+        <p className="story-preview">
+          No stories yet — be the first to share yours and get discovered by the community.
+        </p>
+        <div className="story-actions">
+          <Link to="/submit" className="btn btn-primary btn-sm">Submit Your Story</Link>
+        </div>
+      </div>
+    )
+  }
+
   const handleCopy = async () => {
     await copyText(featured.walletAddress)
     toast(`Wallet copied: ${shortWallet(featured.walletAddress)}`)
