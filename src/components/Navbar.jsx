@@ -31,6 +31,15 @@ export default function Navbar() {
           </span>
         </Link>
 
+        <a
+          href="https://bullpen.fi/@chesus"
+          target="_blank"
+          rel="noreferrer"
+          className="btn btn-primary btn-sm nav-center-cta"
+        >
+          Trade on Bullpen
+        </a>
+
         <div className="nav-actions">
           {connected && (
             <span className="x-connected-badge" title={`X connected: ${handle}`}>
