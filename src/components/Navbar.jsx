@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { BullImage } from './BullArt'
-import { XNavButton } from './XConnect'
+import { XNavButton, useXSession } from './XConnect'
 
 const LINKS = [
   { to: '/guide', label: 'Guide' },
@@ -17,6 +17,7 @@ const LINKS = [
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const { givingList } = useApp()
+  const { handle, avatarUrl, connected } = useXSession()
   const close = () => setOpen(false)
 
   return (
@@ -31,6 +32,16 @@ export default function Navbar() {
         </Link>
 
         <div className="nav-actions">
+          {connected && (
+            <span className="x-connected-badge" title={`X connected: ${handle}`}>
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="" />
+              ) : (
+                <span className="x-connected-fallback">𝕏</span>
+              )}
+              <span className="x-connected-dot" />
+            </span>
+          )}
           <Link to="/submit" className="btn btn-primary btn-sm" onClick={close}>
             Submit Your Story
           </Link>

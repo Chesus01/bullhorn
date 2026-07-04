@@ -5,9 +5,9 @@ import Badge from './Badge'
 const STORAGE_KEY = 'bullhorn_form_snapshot'
 
 // Real X (Twitter) OAuth via Supabase Auth (provider 'x', the newer OAuth 2.0
-// integration). This redirects the whole page to X and back, so the caller's
-// in-progress form is snapshotted first and restored after the round trip —
-// otherwise everything they'd typed would be wiped out by the reload.
+// integration, PKCE flow — see supabaseClient.js for why). This redirects the
+// whole page to X and back, so the caller's in-progress form is snapshotted
+// first and restored after the round trip.
 export function saveFormSnapshot(page, data) {
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ page, data }))
 }
@@ -24,26 +24,46 @@ export function restoreFormSnapshot(page) {
   }
 }
 
+// Shared session state. Uses onAuthStateChange (not just a one-time
+// getSession() check) because the session often isn't finished being
+// established the instant we land back from X's redirect — the auth-state
+// event is what reliably fires once it's actually ready.
+export function useXSession() {
+  const [session, setSession] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session)
+      setLoading(false)
+    })
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession)
+      setLoading(false)
+    })
+    return () => listener.subscription.unsubscribe()
+  }, [])
+
+  const meta = session?.user?.user_metadata
+  const userName = meta?.user_name || meta?.preferred_username
+  const handle = userName ? `@${userName}` : null
+  const avatarUrl = meta?.avatar_url || meta?.picture || null
+
+  return { handle, avatarUrl, loading, connected: !!handle }
+}
+
+export function connectX() {
+  return supabase.auth.signInWithOAuth({
+    provider: 'x',
+    options: { redirectTo: window.location.href },
+  })
+}
+
 // Compact version for the navbar (top-right, every page) — same real OAuth
 // session, just no form to snapshot/restore. Lets people connect X once from
 // anywhere on the site; forms pick up the same verified session automatically.
 export function XNavButton() {
-  const [handle, setHandle] = useState(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const meta = session?.user?.user_metadata
-      const userName = meta?.user_name || meta?.preferred_username
-      if (userName) setHandle(`@${userName}`)
-      setLoading(false)
-    })
-  }, [])
-
-  const connect = () => {
-    supabase.auth.signInWithOAuth({ provider: 'x', options: { redirectTo: window.location.href } })
-  }
-
+  const { handle, loading } = useXSession()
   if (loading) return null
 
   return handle ? (
@@ -51,37 +71,24 @@ export function XNavButton() {
       𝕏 {handle}
     </span>
   ) : (
-    <button type="button" className="btn btn-outline btn-sm" onClick={connect}>
+    <button type="button" className="btn btn-outline btn-sm" onClick={connectX}>
       𝕏 Connect X
     </button>
   )
 }
 
 export default function XConnect({ onVerified, formSnapshot, page }) {
-  const [handle, setHandle] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const { handle, loading, connected } = useXSession()
   const [error, setError] = useState('')
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const meta = session?.user?.user_metadata
-      const userName = meta?.user_name || meta?.preferred_username
-      if (userName) {
-        const h = `@${userName}`
-        setHandle(h)
-        onVerified?.(h)
-      }
-      setLoading(false)
-    })
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    if (connected) onVerified?.(handle)
+  }, [connected]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const connect = async () => {
     setError('')
     saveFormSnapshot(page, formSnapshot)
-    const { error: err } = await supabase.auth.signInWithOAuth({
-      provider: 'x',
-      options: { redirectTo: window.location.href },
-    })
+    const { error: err } = await connectX()
     if (err) setError(err.message)
   }
 
@@ -100,7 +107,7 @@ export default function XConnect({ onVerified, formSnapshot, page }) {
         </div>
       )}
 
-      {loading ? null : handle ? (
+      {loading ? null : connected ? (
         <div className="badge-row" style={{ alignItems: 'center' }}>
           <Badge label="X Verified" />
           <span className="green small">{handle}</span>
