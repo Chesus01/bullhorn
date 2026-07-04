@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { CATEGORIES, CREATED_OPTIONS } from '../data/mockData'
 import { looksLikeSolanaAddress } from '../utils'
+import { screenContent } from '../utils/contentFilter'
 import DisclaimerBox from '../components/DisclaimerBox'
 import { CaptchaPlaceholder } from '../components/Placeholders'
 import XConnect, { restoreFormSnapshot } from '../components/XConnect'
@@ -40,6 +41,7 @@ export default function SubmitStory() {
   const [walletVerified, setWalletVerified] = useState(false)
   const [ansemHolderVerified, setAnsemHolderVerified] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [heldForReview, setHeldForReview] = useState(false)
 
   useEffect(() => {
     const restored = restoreFormSnapshot('submit')
@@ -76,6 +78,8 @@ export default function SubmitStory() {
     const badges = ['Wallet Submitted']
     if (walletVerified) badges.push('Wallet Verified', 'Wallet Ownership Signed')
     if (ansemHolderVerified) badges.push('$ANSEM Holder Verified')
+    const { flagged } = screenContent(form.title, form.story, form.need, form.publicNote)
+    setHeldForReview(flagged)
     addStory({
       title: form.title.trim(),
       alias: form.alias.trim(),
@@ -91,7 +95,7 @@ export default function SubmitStory() {
       receivedSupport: false,
       supportTransactions: [],
       featured: false,
-      status: 'pending',
+      status: flagged ? 'pending' : 'approved',
       fraudRisk: 'pending',
       duplicateRisk: 0,
       spamRisk: 0,
@@ -114,12 +118,13 @@ export default function SubmitStory() {
       <div className="container section">
         <div className="final-cta" style={{ maxWidth: 620, margin: '40px auto' }}>
           <div style={{ fontSize: '2.4rem', marginBottom: 12 }}>🐂</div>
-          <h2>Story submitted for review.</h2>
+          <h2>{heldForReview ? 'Story submitted for review.' : 'Story is live!'}</h2>
           <p className="muted" style={{ margin: '14px 0 24px' }}>
-            Thank you for sharing. A community reviewer will look at your submission before it
-            appears publicly. Submitting a story does not guarantee rewards, donations,
-            visibility, or support — but real, verified stories are exactly what this board
-            exists for.
+            {heldForReview
+              ? 'Thanks for sharing. Our automated check flagged something in your submission, so a reviewer will look at it before it appears publicly.'
+              : 'Thanks for sharing — your story is already visible on the site.'}{' '}
+            Submitting a story does not guarantee rewards, donations, visibility, or support — but
+            real, verified stories are exactly what this board exists for.
           </p>
           <div className="hero-ctas" style={{ justifyContent: 'center' }}>
             <Link to="/stories" className="btn btn-primary">Browse Stories</Link>
@@ -257,7 +262,7 @@ export default function SubmitStory() {
             Submit Story for Review
           </button>
           <p className="small muted center">
-            Real stories. Real wallets. Real people. Submissions are reviewed before appearing publicly.
+            Real stories. Real wallets. Real people. Submissions publish instantly unless flagged for review.
           </p>
         </form>
       </div>

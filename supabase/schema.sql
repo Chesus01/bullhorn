@@ -13,11 +13,12 @@ create table if not exists stories (
 
 alter table stories enable row level security;
 
--- Anyone can submit a story, but it always lands as pending — a submitter
--- can't mark their own story pre-approved.
-create policy "Anyone can submit a pending story"
+-- Stories auto-publish on submit (no admin approval step) — matches the
+-- "no admin auth yet" reality of the other policies below. Bad/scam entries
+-- are handled after the fact via the Admin dashboard's Hide action.
+create policy "Anyone can submit a story"
   on stories for insert
-  with check (status = 'pending');
+  with check (true);
 
 -- No admin login exists yet (documented Phase 3 item). The admin dashboard
 -- needs to read every row (including pending/hidden) and needs to write
