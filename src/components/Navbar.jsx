@@ -17,11 +17,12 @@ const LINKS = [
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const { givingList } = useApp()
+  const close = () => setOpen(false)
 
   return (
     <header className="navbar">
       <div className="container navbar-inner">
-        <Link to="/" className="nav-logo" onClick={() => setOpen(false)}>
+        <Link to="/" className="nav-logo" onClick={close}>
           <BullImage height={40} className="horn-pulse" />
           <span className="logo-text">
             <span className="l1">Bull</span>
@@ -29,29 +30,8 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <nav className="nav-links">
-          {LINKS.map((l) => (
-            <NavLink key={l.to} to={l.to} className={({ isActive }) => (isActive ? 'active' : '')}>
-              {l.label}
-            </NavLink>
-          ))}
-        </nav>
-
         <div className="nav-actions">
-          <a
-            href="https://bullpen.fi/@chesus"
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-primary btn-sm nav-cta"
-          >
-            Bullpen ↗
-          </a>
-          <Link to="/giving-list" className="giving-list-pill" title="Your Giving List">
-            <span>🎁</span>
-            <span className="giving-list-count">{givingList.length}</span>
-          </Link>
-          <XNavButton />
-          <Link to="/submit" className="btn btn-primary btn-sm nav-cta">
+          <Link to="/submit" className="btn btn-primary btn-sm" onClick={close}>
             Submit Your Story
           </Link>
           <button
@@ -65,29 +45,29 @@ export default function Navbar() {
         </div>
       </div>
 
-      {open && (
-        <nav className="mobile-menu">
-          {LINKS.map((l) => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              className={({ isActive }) => (isActive ? 'active' : '')}
-              onClick={() => setOpen(false)}
-            >
-              {l.label}
-            </NavLink>
-          ))}
-          <NavLink to="/giving-list" onClick={() => setOpen(false)}>
-            Giving List ({givingList.length})
+      {open && <div className="nav-panel-backdrop" onClick={close} />}
+
+      <nav className={`nav-panel ${open ? 'open' : ''}`}>
+        <button className="nav-panel-close" onClick={close} aria-label="Close menu">✕</button>
+
+        {LINKS.map((l) => (
+          <NavLink key={l.to} to={l.to} className={({ isActive }) => (isActive ? 'active' : '')} onClick={close}>
+            {l.label}
           </NavLink>
-          <a href="https://bullpen.fi/@chesus" target="_blank" rel="noreferrer" className="btn btn-primary" onClick={() => setOpen(false)}>
-            Bullpen ↗
-          </a>
-          <Link to="/submit" className="btn btn-primary" onClick={() => setOpen(false)}>
-            Submit Your Story
-          </Link>
-        </nav>
-      )}
+        ))}
+
+        <hr className="divider" />
+
+        <NavLink to="/giving-list" onClick={close}>
+          🎁 Giving List ({givingList.length})
+        </NavLink>
+        <div style={{ padding: '10px 14px' }}>
+          <XNavButton />
+        </div>
+        <a href="https://bullpen.fi/@chesus" target="_blank" rel="noreferrer" className="btn btn-outline" onClick={close}>
+          Bullpen ↗
+        </a>
+      </nav>
     </header>
   )
 }

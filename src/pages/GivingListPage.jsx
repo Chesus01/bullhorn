@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext'
 import { shortWallet, copyText, downloadTextFile, solscanUrl } from '../utils'
 import { BadgeRow } from '../components/Badge'
 import DisclaimerBox from '../components/DisclaimerBox'
+import { SceneBackdrop } from '../components/BullArt'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 export default function GivingListPage() {
@@ -35,6 +36,7 @@ export default function GivingListPage() {
 
   return (
     <div className="container">
+      <SceneBackdrop src="/scene-browse.jpg" side="left" opacity={0.2} />
       <div className="page-head">
         <h1>Your <span className="green">Giving List</span>.</h1>
         <p>

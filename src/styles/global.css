@@ -347,47 +347,68 @@ input, select, textarea { font-family: inherit; }
   color: var(--green-neon);
   font-weight: 700;
 }
-.nav-links { display: none; align-items: center; gap: 4px; }
-.nav-links a {
-  padding: 8px 13px;
-  border-radius: 10px;
-  font-size: 0.92rem;
-  font-weight: 500;
-  color: var(--muted);
-  transition: all 0.15s ease;
-}
-.nav-links a:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); }
-.nav-links a.active { color: var(--green-neon); }
 .nav-actions { display: flex; align-items: center; gap: 10px; }
-.nav-cta { display: none; }
 .nav-burger {
   display: flex; flex-direction: column; justify-content: center; gap: 5px;
   width: 42px; height: 42px; padding: 0 10px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
   border-radius: 10px;
+  flex-shrink: 0;
 }
 .nav-burger span { display: block; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.2s ease; }
 .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .nav-burger.open span:nth-child(2) { opacity: 0; }
 .nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-.mobile-menu {
-  border-bottom: 1px solid var(--border);
-  background: rgba(5, 5, 5, 0.97);
-  padding: 12px 20px 20px;
+/* Single side panel holds all nav links + utility actions, at every screen
+   size — replaces the old separate desktop-row / mobile-dropdown split so
+   the top bar never gets crowded regardless of viewport width. */
+.nav-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 3, 3, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 90;
+}
+.nav-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(320px, 86vw);
+  background: var(--card-2);
+  border-left: 1px solid var(--border-strong);
+  z-index: 91;
+  padding: 24px 18px;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.28s ease;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  box-shadow: -20px 0 60px rgba(0, 0, 0, 0.5);
 }
-.mobile-menu a {
+.nav-panel.open { transform: translateX(0); }
+.nav-panel-close {
+  align-self: flex-end;
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+.nav-panel a {
   padding: 12px 14px;
   border-radius: 10px;
   font-weight: 500;
   color: var(--muted);
 }
-.mobile-menu a:hover, .mobile-menu a.active { color: var(--text); background: rgba(255, 255, 255, 0.05); }
-.mobile-menu .btn { margin-top: 10px; }
+.nav-panel a:hover, .nav-panel a.active { color: var(--text); background: rgba(255, 255, 255, 0.05); }
+.nav-panel .divider { margin: 10px 0; }
+.nav-panel .btn { width: 100%; }
 
 .giving-list-pill {
   position: relative;
@@ -410,12 +431,6 @@ input, select, textarea { font-family: inherit; }
   display: inline-flex; align-items: center; justify-content: center;
   padding: 0 5px;
   font-weight: 800;
-}
-
-@media (min-width: 900px) {
-  .nav-links { display: flex; }
-  .nav-cta { display: inline-flex; }
-  .nav-burger, .mobile-menu { display: none; }
 }
 
 /* ============ Hero ============ */

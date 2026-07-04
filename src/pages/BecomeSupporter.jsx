@@ -7,6 +7,7 @@ import { CaptchaPlaceholder } from '../components/Placeholders'
 import XConnect, { restoreFormSnapshot } from '../components/XConnect'
 import SolanaWalletConnect from '../components/SolanaWalletConnect'
 import { TokenText } from '../components/TokenText'
+import { SceneBackdrop } from '../components/BullArt'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const SUPPORTER_TYPES = [
@@ -114,6 +115,7 @@ export default function BecomeSupporter() {
 
   return (
     <div className="container">
+      <SceneBackdrop src="/scene-supporters.jpg" side="right" opacity={0.2} />
       <div className="page-head">
         <h1>Ansem sparked it. <span className="green">The community can carry it.</span></h1>
         <p>
@@ -122,7 +124,7 @@ export default function BecomeSupporter() {
         </p>
       </div>
 
-      <div className="section" style={{ paddingTop: 24, maxWidth: 760 }}>
+      <div className="section" style={{ paddingTop: 24, maxWidth: 760, margin: '0 auto' }}>
         <div style={{ marginBottom: 24 }}>
           <DisclaimerBox variant="safe" icon="🛡️" title="Supporter safety">
             Bullhorn does not hold donations or process payouts. Supporters give

@@ -8,6 +8,7 @@ import { TokenText } from '../components/TokenText'
 import { usePageTitle } from '../hooks/usePageTitle'
 import StoryCard from '../components/StoryCard'
 import DisclaimerBox from '../components/DisclaimerBox'
+import { SceneBackdrop } from '../components/BullArt'
 
 function FraudRiskCard({ story }) {
   // Public fraud-risk review — flags risk signals only. Never judges who deserves help.
@@ -82,6 +83,7 @@ export default function StoryDetail() {
 
   return (
     <div className="container">
+      <SceneBackdrop src="/scene-giveback.jpg" side="right" opacity={0.2} />
       <div className="page-head">
         <div className="badge-row" style={{ marginBottom: 14 }}>
           <span className="category-tag"><TokenText>{story.category}</TokenText></span>

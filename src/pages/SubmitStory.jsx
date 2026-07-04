@@ -8,6 +8,7 @@ import { CaptchaPlaceholder } from '../components/Placeholders'
 import XConnect, { restoreFormSnapshot } from '../components/XConnect'
 import SolanaWalletConnect from '../components/SolanaWalletConnect'
 import { TokenText } from '../components/TokenText'
+import { SceneBackdrop } from '../components/BullArt'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const HOLDER_OPTIONS = ['Yes', 'No', 'Not sure', 'Prefer not to say']
@@ -142,6 +143,7 @@ export default function SubmitStory() {
 
   return (
     <div className="container">
+      <SceneBackdrop src="/scene-browse.jpg" side="left" opacity={0.2} />
       <div className="page-head">
         <h1>Submit your <span className="green">story</span>.</h1>
         <p>
@@ -150,7 +152,7 @@ export default function SubmitStory() {
         </p>
       </div>
 
-      <div className="section" style={{ paddingTop: 24, maxWidth: 760 }}>
+      <div className="section" style={{ paddingTop: 24, maxWidth: 760, margin: '0 auto' }}>
         <div style={{ marginBottom: 24 }}>
           <DisclaimerBox variant="danger" icon="⚠️" title="Before you submit">
             Submitting a story does not guarantee rewards, donations, visibility, or support. Do

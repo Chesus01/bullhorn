@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import DisclaimerBox, { GlobalDisclaimer } from '../components/DisclaimerBox'
 import { TokenText } from '../components/TokenText'
+import { SceneBackdrop } from '../components/BullArt'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const DOES = [
@@ -28,11 +29,12 @@ export default function About() {
   usePageTitle('About & Disclaimer')
   return (
     <div className="container">
+      <SceneBackdrop src="/scene-giveback.jpg" side="right" opacity={0.25} />
       <div className="page-head">
         <h1>Built to help real people rise above <span className="green">bot noise</span>.</h1>
       </div>
 
-      <div className="section" style={{ paddingTop: 24, maxWidth: 820 }}>
+      <div className="section" style={{ paddingTop: 24, maxWidth: 820, margin: '0 auto' }}>
         {/* Mission */}
         <div className="card card-elevated" style={{ marginBottom: 22 }}>
           <h2 style={{ fontSize: '1.25rem', marginBottom: 12 }}>Why this exists</h2>
