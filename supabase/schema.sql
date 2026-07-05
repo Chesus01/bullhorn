@@ -34,3 +34,30 @@ create policy "Open read (no admin auth yet)"
 create policy "Open update (no admin auth yet)"
   on stories for update
   using (true);
+
+-- Public giving ledger: a recipient pastes a tx signature after receiving
+-- support, the app verifies on-chain that it really paid their wallet (see
+-- verifyReceivedOnChain in src/utils.js), then this row records the proof.
+-- Anyone can read it (it's just public chain data anyway); insert requires a
+-- signature-shaped string, but the real fraud-proofing happens client-side
+-- against Solana RPC before the insert — same accepted-gap pattern as the
+-- rest of this schema (no serverless backend to verify server-side yet).
+create extension if not exists pgcrypto;
+
+create table if not exists story_confirmations (
+  id uuid primary key default gen_random_uuid(),
+  story_id text not null references stories(id) on delete cascade,
+  tx_signature text not null unique,
+  amount_sol numeric not null,
+  confirmed_at timestamptz not null default now()
+);
+
+alter table story_confirmations enable row level security;
+
+create policy "Anyone can read confirmations"
+  on story_confirmations for select
+  using (true);
+
+create policy "Anyone can insert a verified confirmation"
+  on story_confirmations for insert
+  with check (length(tx_signature) >= 64 and amount_sol > 0);

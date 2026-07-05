@@ -7,6 +7,10 @@ export function solscanUrl(addr) {
   return `https://solscan.io/account/${addr}`
 }
 
+export function solscanTxUrl(sig) {
+  return `https://solscan.io/tx/${sig}`
+}
+
 export async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text)
@@ -103,3 +107,40 @@ export function spotlightScore(story) {
 
 export const VERIFICATION_MESSAGE =
   'I am verifying ownership of this wallet for Bullhorn. This does not authorize any transaction or token movement.'
+
+// Verifies a pasted transaction signature actually paid the story's wallet,
+// by reading balance deltas straight from the public Solana ledger — never
+// trusts a pasted number, only what the chain confirms.
+export async function verifyReceivedOnChain(connection, signature, walletAddress) {
+  let tx
+  try {
+    tx = await connection.getTransaction(signature, { maxSupportedTransactionVersion: 0 })
+  } catch {
+    return { ok: false, reason: 'Could not reach the Solana network. Try again in a moment.' }
+  }
+  if (!tx) {
+    return { ok: false, reason: "Transaction not found on-chain yet — it may still be confirming. Try again shortly." }
+  }
+  if (tx.meta?.err) {
+    return { ok: false, reason: 'That transaction failed on-chain.' }
+  }
+
+  const keys = tx.transaction.message.getAccountKeys().staticAccountKeys
+  const idx = keys.findIndex((k) => k.toBase58() === walletAddress)
+  if (idx === -1) {
+    return { ok: false, reason: "This transaction doesn't involve this story's wallet." }
+  }
+
+  const pre = tx.meta?.preBalances?.[idx]
+  const post = tx.meta?.postBalances?.[idx]
+  if (pre == null || post == null) {
+    return { ok: false, reason: 'Could not read balances for this transaction.' }
+  }
+
+  const lamports = post - pre
+  if (lamports <= 0) {
+    return { ok: false, reason: "This wallet didn't receive funds in that transaction." }
+  }
+
+  return { ok: true, amountSol: lamports / 1e9 }
+}

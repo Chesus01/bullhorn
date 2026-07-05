@@ -10,6 +10,7 @@ export function AppProvider({ children }) {
   const [stories, setStories] = useState(MOCK_STORIES)
   const [supporters, setSupporters] = useState(MOCK_SUPPORTERS)
   const [givingList, setGivingList] = useState([]) // [{ storyId, note }]
+  const [confirmations, setConfirmations] = useState([])
   const [toasts, setToasts] = useState([])
 
   const toast = useCallback((message, type = 'success') => {
@@ -66,6 +67,42 @@ export function AppProvider({ children }) {
     return id
   }, [toast])
 
+  // Public giving ledger — loaded once, same pattern as stories above.
+  useEffect(() => {
+    let cancelled = false
+    supabase
+      .from('story_confirmations')
+      .select('*')
+      .then(({ data, error }) => {
+        if (cancelled || error) return
+        setConfirmations(
+          data.map((r) => ({
+            id: r.id,
+            storyId: r.story_id,
+            txSignature: r.tx_signature,
+            amountSol: Number(r.amount_sol),
+            confirmedAt: r.confirmed_at,
+          }))
+        )
+      })
+    return () => { cancelled = true }
+  }, [])
+
+  const addConfirmation = useCallback(async (storyId, txSignature, amountSol) => {
+    const { data, error } = await supabase
+      .from('story_confirmations')
+      .insert({ story_id: storyId, tx_signature: txSignature, amount_sol: amountSol })
+      .select()
+      .single()
+    if (!error) {
+      setConfirmations((list) => [
+        ...list,
+        { id: data.id, storyId, txSignature, amountSol, confirmedAt: data.confirmed_at },
+      ])
+    }
+    return { error }
+  }, [])
+
   const addSupporter = useCallback((sup) => {
     const id = `sup${++nextId}`
     setSupporters((list) => [...list, { ...sup, id }])
@@ -100,6 +137,8 @@ export function AppProvider({ children }) {
     stories,
     supporters,
     givingList,
+    confirmations,
+    addConfirmation,
     toasts,
     toast,
     updateStory,

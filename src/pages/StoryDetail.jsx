@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useConnection } from '@solana/wallet-adapter-react'
 import { useApp } from '../context/AppContext'
 import { MOCK_VOUCHES } from '../data/mockData'
-import { shortWallet, solscanUrl, copyText, shareOnXUrl } from '../utils'
+import { shortWallet, solscanUrl, solscanTxUrl, copyText, shareOnXUrl, verifyReceivedOnChain } from '../utils'
 import Badge, { BadgeRow } from '../components/Badge'
 import { TokenText } from '../components/TokenText'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -38,8 +39,10 @@ function FraudRiskCard({ story }) {
 
 export default function StoryDetail() {
   const { id } = useParams()
-  const { stories, toast, updateStory, inGivingList, addToGivingList, removeFromGivingList } = useApp()
+  const { stories, toast, updateStory, inGivingList, addToGivingList, removeFromGivingList, confirmations, addConfirmation } = useApp()
+  const { connection } = useConnection()
   const [txHash, setTxHash] = useState('')
+  const [verifying, setVerifying] = useState(false)
   const story = stories.find((s) => s.id === id)
   usePageTitle(story?.title)
 
@@ -56,6 +59,7 @@ export default function StoryDetail() {
   }
 
   const vouches = MOCK_VOUCHES[story.id] || []
+  const storyConfirmations = confirmations.filter((c) => c.storyId === story.id)
   const listed = inGivingList(story.id)
   const related = stories
     .filter((s) => s.id !== story.id && s.status === 'approved' && (s.category === story.category || s.badges.some((b) => story.badges.includes(b) && ['Creator', 'Builder'].includes(b))))
@@ -71,14 +75,31 @@ export default function StoryDetail() {
     else { addToGivingList(story.id); toast('Added to Giving List 🎁') }
   }
 
-  const handleSupported = () => {
+  const handleSupported = async () => {
+    const signature = txHash.trim()
+    if (!signature) {
+      toast('Paste the transaction signature from your transfer first.', 'error')
+      return
+    }
+    setVerifying(true)
+    const result = await verifyReceivedOnChain(connection, signature, story.walletAddress)
+    setVerifying(false)
+    if (!result.ok) {
+      toast(result.reason, 'error')
+      return
+    }
+    const { error } = await addConfirmation(story.id, signature, result.amountSol)
+    if (error) {
+      toast(error.code === '23505' ? 'That transaction was already confirmed.' : 'Verified on-chain, but failed to save.', 'error')
+      return
+    }
     updateStory(story.id, (s) => ({
       receivedSupport: true,
       badges: s.badges.includes('Received Support') ? s.badges : [...s.badges, 'Received Support'],
-      supportTransactions: txHash.trim() ? [...s.supportTransactions, txHash.trim()] : s.supportTransactions,
+      supportTransactions: [...s.supportTransactions, signature],
     }))
     setTxHash('')
-    toast('Marked as supported 💛 Thank you for giving back.')
+    toast(`Verified on-chain: ${result.amountSol.toFixed(4)} SOL received 💛`)
   }
 
   return (
@@ -185,22 +206,34 @@ export default function StoryDetail() {
           <FraudRiskCard story={story} />
 
           <div className="card">
-            <h3 style={{ fontSize: '1rem', marginBottom: 10 }}>💛 Did you support this story?</h3>
+            <h3 style={{ fontSize: '1rem', marginBottom: 10 }}>💛 Confirm a gift</h3>
             <p className="small muted" style={{ marginBottom: 12 }}>
-              If you sent support from your own wallet, you can mark it here and optionally paste
-              the transaction hash for transparency.
+              Paste the transaction signature from a transfer to this wallet. We check it directly
+              against the Solana chain — no self-reported amounts, no trust required.
             </p>
             <div className="form-grid" style={{ gap: 10 }}>
               <input
                 value={txHash}
                 onChange={(e) => setTxHash(e.target.value)}
-                placeholder="Transaction hash (optional)"
+                placeholder="Transaction signature"
                 style={{ width: '100%', background: 'var(--card-2)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 12px', color: 'var(--text)', fontFamily: 'monospace', fontSize: '0.8rem' }}
               />
-              <button className="btn btn-green btn-block" onClick={handleSupported}>
-                Mark as Supported
+              <button className="btn btn-green btn-block" onClick={handleSupported} disabled={verifying}>
+                {verifying ? 'Verifying on-chain…' : 'Verify & Confirm'}
               </button>
             </div>
+
+            {storyConfirmations.length > 0 && (
+              <div className="form-grid" style={{ gap: 8, marginTop: 16 }}>
+                <hr className="divider" style={{ margin: '4px 0' }} />
+                <p className="small muted">✅ {storyConfirmations.length} confirmed gift{storyConfirmations.length > 1 ? 's' : ''}</p>
+                {storyConfirmations.map((c) => (
+                  <a key={c.txSignature} href={solscanTxUrl(c.txSignature)} target="_blank" rel="noreferrer" className="small green">
+                    {c.amountSol.toFixed(4)} SOL · {new Date(c.confirmedAt).toLocaleDateString()} ↗
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
           <button
