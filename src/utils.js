@@ -87,8 +87,11 @@ export function looksLikeSolanaAddress(addr) {
 
 // Share a story to the X timeline via the web intent — no login or API needed.
 export function shareOnXUrl(story) {
-  const url = `${window.location.origin}${window.location.pathname}#/story/${story.id}`
-  const text = `Bullhorn 🐂 — verified wallets, real stories, direct giving. No bots, no middleman, no custody.\n\n"${story.title}"\n\n${url}\n\nWhat's your story?`
+  // Points at the generated share-card page (see scripts/generate-share-cards.mjs)
+  // instead of the raw #/story/ hash URL, so X actually renders a card with
+  // this story's own title/description instead of the generic site card.
+  const url = `${window.location.origin}/s/${story.id}.html`
+  const text = `Bullhorn 🐂 — verified wallets, real stories, direct giving. No bots, no middleman, no custody.\n\n${url}\n\nWhat's your story?`
   return `https://x.com/intent/post?text=${encodeURIComponent(text)}`
 }
 
