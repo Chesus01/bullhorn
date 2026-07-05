@@ -1,34 +1,50 @@
-import { useState } from 'react'
+import { useEffect, useRef } from 'react'
+import { TURNSTILE_SITE_KEY } from '../config'
 
-// Real, dependency-free bot check (no external service/account needed).
-// Same {checked, onChange(bool)} contract as before, so callers don't change.
-export function CaptchaPlaceholder({ onChange }) {
-  const [challenge] = useState(() => {
-    const a = Math.floor(Math.random() * 8) + 1
-    const b = Math.floor(Math.random() * 8) + 1
-    return { a, b, answer: a + b }
-  })
-  const [value, setValue] = useState('')
-
-  const handleChange = (v) => {
-    setValue(v)
-    onChange(v !== '' && Number(v) === challenge.answer)
+let turnstileScriptPromise = null
+function loadTurnstileScript() {
+  if (window.turnstile) return Promise.resolve()
+  if (!turnstileScriptPromise) {
+    turnstileScriptPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
+      script.async = true
+      script.defer = true
+      script.onload = resolve
+      script.onerror = reject
+      document.head.appendChild(script)
+    })
   }
+  return turnstileScriptPromise
+}
 
-  return (
-    <div className="captcha-box" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-      <b>Quick check: what is {challenge.a} + {challenge.b}?</b>
-      <input
-        type="number"
-        inputMode="numeric"
-        value={value}
-        onChange={(e) => handleChange(e.target.value)}
-        placeholder="Your answer"
-        style={{
-          marginTop: 10, width: 120, background: 'var(--card-2)', border: '1px solid var(--border)',
-          borderRadius: 8, padding: '8px 10px', color: 'var(--text)', fontSize: '0.95rem',
-        }}
-      />
-    </div>
-  )
+// Real bot protection via Cloudflare Turnstile — replaces the old math-
+// question captcha, which only had a handful of possible answers and was
+// trivial for a scripted bot to brute force. Same {onChange(bool)} contract
+// as before, so callers (SubmitStory, BecomeSupporter) don't need to change.
+export function CaptchaPlaceholder({ onChange }) {
+  const containerRef = useRef(null)
+  const widgetIdRef = useRef(null)
+
+  useEffect(() => {
+    let cancelled = false
+    loadTurnstileScript().then(() => {
+      if (cancelled || !containerRef.current || !window.turnstile) return
+      widgetIdRef.current = window.turnstile.render(containerRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        theme: 'dark',
+        callback: () => onChange(true),
+        'expired-callback': () => onChange(false),
+        'error-callback': () => onChange(false),
+      })
+    })
+    return () => {
+      cancelled = true
+      if (widgetIdRef.current != null && window.turnstile) {
+        window.turnstile.remove(widgetIdRef.current)
+      }
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  return <div ref={containerRef} />
 }

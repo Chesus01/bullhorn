@@ -14,3 +14,8 @@ export const ANSEM_BUY_URL = null
 // policies on the `stories` table (see supabase/schema.sql).
 export const SUPABASE_URL = 'https://kfesysoazbaxletearwp.supabase.co'
 export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_DpqMZjcK58QM0oOKQprQWA_ws01z9PY'
+
+// Cloudflare Turnstile site key — safe to ship client-side (it's the public
+// half of the pair; the secret key is only needed for server-side
+// verification, which this site doesn't have a backend for yet).
+export const TURNSTILE_SITE_KEY = '0x4AAAAAADwD8_6ANF3YScqn'
