@@ -218,27 +218,9 @@ export default function Admin() {
 
   const isOwner = connected && handle?.replace('@', '').toLowerCase() === ADMIN_X_HANDLE
 
-  if (loading) return null
-
-  if (!isOwner) {
-    return (
-      <div className="container section">
-        <div className="empty-state">
-          <div className="icon">🔒</div>
-          <p><b>This dashboard is restricted to the site owner's X account.</b></p>
-          {connected ? (
-            <p className="small muted" style={{ marginTop: 8 }}>Connected as {handle}, which isn't authorized.</p>
-          ) : (
-            <>
-              <p className="small muted" style={{ marginBottom: 14 }}>Connect the owner's X account to continue.</p>
-              <button type="button" className="btn btn-primary btn-sm" onClick={connectX}>𝕏 Connect X Account</button>
-            </>
-          )}
-        </div>
-      </div>
-    )
-  }
-
+  // All hooks must run on every render regardless of auth state — never put
+  // a hook after a conditional return, or React loses track of hook order
+  // the moment isOwner flips and crashes the whole tree.
   const list = useMemo(() => {
     let l = stories.filter((s) => !deleted.includes(s.id))
     switch (filter) {
@@ -281,6 +263,27 @@ export default function Admin() {
         setDeleted((d) => [...d, s.id]); setSelectedId(null); toast('Submission deleted', 'error'); break
       default: break
     }
+  }
+
+  if (loading) return null
+
+  if (!isOwner) {
+    return (
+      <div className="container section">
+        <div className="empty-state">
+          <div className="icon">🔒</div>
+          <p><b>This dashboard is restricted to the site owner's X account.</b></p>
+          {connected ? (
+            <p className="small muted" style={{ marginTop: 8 }}>Connected as {handle}, which isn't authorized.</p>
+          ) : (
+            <>
+              <p className="small muted" style={{ marginBottom: 14 }}>Connect the owner's X account to continue.</p>
+              <button type="button" className="btn btn-primary btn-sm" onClick={connectX}>𝕏 Connect X Account</button>
+            </>
+          )}
+        </div>
+      </div>
+    )
   }
 
   return (
