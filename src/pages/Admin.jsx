@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useApp } from '../context/AppContext'
 import { MOCK_VOUCHES } from '../data/mockData'
-import { shortWallet, solscanUrl } from '../utils'
+import { shortWallet, solscanUrl, looksLikeXPostUrl } from '../utils'
 import { BadgeRow, StatusPill, RiskBadge } from '../components/Badge'
 import FilterMenu from '../components/FilterMenu'
 import DisclaimerBox from '../components/DisclaimerBox'
@@ -88,6 +88,7 @@ function ToolsManager() {
 
 function AdminDetail({ story, onAction }) {
   const [txHash, setTxHash] = useState('')
+  const [featuredPostUrl, setFeaturedPostUrl] = useState(story.featuredPostUrl || '')
   const vouches = MOCK_VOUCHES[story.id] || []
 
   return (
@@ -201,6 +202,21 @@ function AdminDetail({ story, onAction }) {
                 Attach tx hash
               </button>
             </div>
+            <div style={{ marginTop: 12 }}>
+              <input
+                value={featuredPostUrl}
+                onChange={(e) => setFeaturedPostUrl(e.target.value)}
+                placeholder="Featured X post URL…"
+                style={{ width: '100%', background: 'var(--card-2)', border: '1px solid var(--border)', borderRadius: 10, padding: '9px 12px', color: 'var(--text)', fontFamily: 'monospace', fontSize: '0.78rem' }}
+              />
+              <button
+                className="btn btn-outline btn-sm"
+                style={{ marginTop: 8 }}
+                onClick={() => onAction('featuredPost', featuredPostUrl.trim())}
+              >
+                Save Featured Post
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -259,6 +275,12 @@ export default function Admin() {
         updateStory(s.id, (st) => ({ receivedSupport: true, badges: st.badges.includes('Received Support') ? st.badges : [...st.badges, 'Received Support'] })); toast('Marked as Received Support 💛'); break
       case 'txhash':
         updateStory(s.id, (st) => ({ supportTransactions: [...st.supportTransactions, payload] })); toast('Transaction hash attached'); break
+      case 'featuredPost':
+        if (payload && !looksLikeXPostUrl(payload)) {
+          toast('That doesn\'t look like a link to a specific X post.', 'error')
+          break
+        }
+        updateStory(s.id, { featuredPostUrl: payload || null }); toast(payload ? 'Featured post saved' : 'Featured post cleared'); break
       case 'delete':
         setDeleted((d) => [...d, s.id]); setSelectedId(null); toast('Submission deleted', 'error'); break
       default: break
