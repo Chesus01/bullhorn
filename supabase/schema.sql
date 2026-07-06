@@ -1,7 +1,24 @@
 -- Run this once in the Supabase SQL Editor (Project → SQL Editor → New query → paste → Run).
 -- Stores each story as flexible JSON in `data`, with a few real columns pulled
--- out for fast filtering/RLS. No auth system yet, so writes are intentionally
--- permissive — matches the site's current "admin has no login yet" reality.
+-- out for fast filtering/RLS.
+
+-- Real admin auth: reuses the site's existing X OAuth login (same session
+-- used everywhere else on the site) instead of a separate password system.
+-- Supabase attaches the signed-in user's X profile as `user_metadata` on
+-- their JWT, so this checks that directly — enforced by the database, not
+-- just hidden by the page. Update this handle if the owner's X account ever
+-- changes.
+create or replace function is_site_owner()
+returns boolean
+language sql
+stable
+as $$
+  select coalesce(
+    lower(auth.jwt() -> 'user_metadata' ->> 'user_name') = 'chesus'
+    or lower(auth.jwt() -> 'user_metadata' ->> 'preferred_username') = 'chesus',
+    false
+  );
+$$;
 
 create table if not exists stories (
   id text primary key,
@@ -20,20 +37,20 @@ create policy "Anyone can submit a story"
   on stories for insert
   with check (true);
 
--- No admin login exists yet (documented Phase 3 item). The admin dashboard
--- needs to read every row (including pending/hidden) and needs to write
--- approve/feature/hide/delete actions, and there's no auth layer to gate
--- that on — so reads and updates are open for now. This is an accepted,
--- documented gap (matches "Admin auth: /#/admin is currently open (demo)"
--- already called out in README.md), not an oversight. Tighten this once
--- real admin auth ships.
-create policy "Open read (no admin auth yet)"
+-- Reads stay open: the public Browse/Home pages and the Admin dashboard
+-- both read this same table (admin needs to see pending/hidden rows too),
+-- and there's no separate "public" view to split them across.
+create policy "Open read"
   on stories for select
   using (true);
 
-create policy "Open update (no admin auth yet)"
+-- Admin actions (approve/feature/hide/mark supported) now require being
+-- signed in as the site owner's actual X account — reuses the same X OAuth
+-- session already used for story verification, so no separate login system
+-- was needed. is_site_owner() is defined further down.
+create policy "Only the site owner can update stories"
   on stories for update
-  using (true);
+  using (is_site_owner());
 
 -- Public giving ledger: a recipient pastes a tx signature after receiving
 -- support, the app verifies on-chain that it really paid their wallet (see
@@ -84,7 +101,6 @@ create policy "Open read (no admin auth yet)"
 
 -- Community tools directory — hand-curated from the Admin dashboard (e.g.
 -- tools Ansem shares, community-built analytics sites), not user-submitted.
--- Same "no admin auth yet" open-write reality as everything else here.
 create table if not exists community_tools (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -96,14 +112,14 @@ create table if not exists community_tools (
 
 alter table community_tools enable row level security;
 
-create policy "Open read (no admin auth yet)"
+create policy "Open read"
   on community_tools for select
   using (true);
 
-create policy "Open write (no admin auth yet)"
+create policy "Only the site owner can add tools"
   on community_tools for insert
-  with check (true);
+  with check (is_site_owner());
 
-create policy "Open delete (no admin auth yet)"
+create policy "Only the site owner can remove tools"
   on community_tools for delete
-  using (true);
+  using (is_site_owner());

@@ -5,7 +5,12 @@ import { shortWallet, solscanUrl } from '../utils'
 import { BadgeRow, StatusPill, RiskBadge } from '../components/Badge'
 import FilterMenu from '../components/FilterMenu'
 import DisclaimerBox from '../components/DisclaimerBox'
+import { useXSession, connectX } from '../components/XConnect'
 import { usePageTitle } from '../hooks/usePageTitle'
+
+// Must match the is_site_owner() check in supabase/schema.sql — this is
+// only a UX gate; the database itself is what actually enforces this.
+const ADMIN_X_HANDLE = 'chesus'
 
 const FILTERS = [
   'All', 'Pending', 'Approved', 'Featured', 'Needs Review', 'Hidden',
@@ -206,9 +211,33 @@ function AdminDetail({ story, onAction }) {
 export default function Admin() {
   usePageTitle('Admin Review Dashboard')
   const { stories, updateStory, toast } = useApp()
+  const { handle, connected, loading } = useXSession()
   const [filter, setFilter] = useState('All')
   const [selectedId, setSelectedId] = useState(null)
   const [deleted, setDeleted] = useState([])
+
+  const isOwner = connected && handle?.replace('@', '').toLowerCase() === ADMIN_X_HANDLE
+
+  if (loading) return null
+
+  if (!isOwner) {
+    return (
+      <div className="container section">
+        <div className="empty-state">
+          <div className="icon">🔒</div>
+          <p><b>This dashboard is restricted to the site owner's X account.</b></p>
+          {connected ? (
+            <p className="small muted" style={{ marginTop: 8 }}>Connected as {handle}, which isn't authorized.</p>
+          ) : (
+            <>
+              <p className="small muted" style={{ marginBottom: 14 }}>Connect the owner's X account to continue.</p>
+              <button type="button" className="btn btn-primary btn-sm" onClick={connectX}>𝕏 Connect X Account</button>
+            </>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   const list = useMemo(() => {
     let l = stories.filter((s) => !deleted.includes(s.id))
@@ -258,15 +287,15 @@ export default function Admin() {
     <div className="container">
       <div className="page-head">
         <h1>Admin <span className="green">Review Dashboard</span>.</h1>
-        <p>Review submissions, check wallet signals, and filter fraud. Demo mode — changes live in local state only.</p>
+        <p>Review submissions, check wallet signals, and filter fraud.</p>
       </div>
 
       <div className="section" style={{ paddingTop: 24 }}>
         <div style={{ marginBottom: 20 }}>
-          <DisclaimerBox variant="gold" icon="🔐" title="Demo dashboard">
-            In production this page sits behind admin authentication (Phase 3). AI review uses
-            fraud-risk language only — it flags bots and spam, it never ranks pain or decides who
-            deserves support.
+          <DisclaimerBox variant="gold" icon="🔐" title="Restricted access">
+            This dashboard is gated to the site owner's X account at the database level, not just
+            hidden by the page. AI review uses fraud-risk language only — it flags bots and spam,
+            it never ranks pain or decides who deserves support.
           </DisclaimerBox>
         </div>
 
