@@ -81,3 +81,29 @@ create policy "Anyone can become a supporter"
 create policy "Open read (no admin auth yet)"
   on supporters for select
   using (true);
+
+-- Community tools directory — hand-curated from the Admin dashboard (e.g.
+-- tools Ansem shares, community-built analytics sites), not user-submitted.
+-- Same "no admin auth yet" open-write reality as everything else here.
+create table if not exists community_tools (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  url text not null,
+  description text,
+  shared_by text,
+  created_at timestamptz not null default now()
+);
+
+alter table community_tools enable row level security;
+
+create policy "Open read (no admin auth yet)"
+  on community_tools for select
+  using (true);
+
+create policy "Open write (no admin auth yet)"
+  on community_tools for insert
+  with check (true);
+
+create policy "Open delete (no admin auth yet)"
+  on community_tools for delete
+  using (true);

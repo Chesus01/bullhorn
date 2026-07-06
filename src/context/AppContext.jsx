@@ -11,6 +11,7 @@ export function AppProvider({ children }) {
   const [supporters, setSupporters] = useState(MOCK_SUPPORTERS)
   const [givingList, setGivingList] = useState([]) // [{ storyId, note }]
   const [confirmations, setConfirmations] = useState([])
+  const [tools, setTools] = useState([])
   const [toasts, setToasts] = useState([])
 
   const toast = useCallback((message, type = 'success') => {
@@ -131,6 +132,50 @@ export function AppProvider({ children }) {
     return id
   }, [toast])
 
+  // Community tools directory — hand-curated from Admin, not user-submitted.
+  useEffect(() => {
+    let cancelled = false
+    supabase
+      .from('community_tools')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (cancelled || error) return
+        setTools(
+          data.map((r) => ({
+            id: r.id,
+            name: r.name,
+            url: r.url,
+            description: r.description,
+            sharedBy: r.shared_by,
+            createdAt: r.created_at,
+          }))
+        )
+      })
+    return () => { cancelled = true }
+  }, [])
+
+  const addTool = useCallback(async (tool) => {
+    const { data, error } = await supabase
+      .from('community_tools')
+      .insert({ name: tool.name, url: tool.url, description: tool.description, shared_by: tool.sharedBy })
+      .select()
+      .single()
+    if (!error) {
+      setTools((list) => [
+        { id: data.id, name: data.name, url: data.url, description: data.description, sharedBy: data.shared_by, createdAt: data.created_at },
+        ...list,
+      ])
+    }
+    return { error }
+  }, [])
+
+  const removeTool = useCallback(async (id) => {
+    setTools((list) => list.filter((t) => t.id !== id))
+    const { error } = await supabase.from('community_tools').delete().eq('id', id)
+    if (error) toast('Failed to delete — it may reappear on reload.', 'error')
+  }, [toast])
+
   const inGivingList = useCallback(
     (storyId) => givingList.some((g) => g.storyId === storyId),
     [givingList]
@@ -161,6 +206,9 @@ export function AppProvider({ children }) {
     givingList,
     confirmations,
     addConfirmation,
+    tools,
+    addTool,
+    removeTool,
     toasts,
     toast,
     updateStory,

@@ -27,6 +27,60 @@ function suggestedAction(story) {
   return 'No action needed.'
 }
 
+function ToolsManager() {
+  const { tools, addTool, removeTool, toast } = useApp()
+  const [form, setForm] = useState({ name: '', url: '', description: '', sharedBy: '' })
+  const set = (key, value) => setForm((f) => ({ ...f, [key]: value }))
+
+  const handleAdd = async (ev) => {
+    ev.preventDefault()
+    if (!form.name.trim() || !form.url.trim()) {
+      toast('Name and link are required.', 'error')
+      return
+    }
+    const { error } = await addTool({
+      name: form.name.trim(),
+      url: form.url.trim(),
+      description: form.description.trim() || null,
+      sharedBy: form.sharedBy.trim() || null,
+    })
+    if (error) toast('Failed to save tool.', 'error')
+    else {
+      toast('Tool added')
+      setForm({ name: '', url: '', description: '', sharedBy: '' })
+    }
+  }
+
+  return (
+    <div className="card card-elevated" style={{ marginTop: 30 }}>
+      <h3 style={{ marginBottom: 14 }}>🧰 Manage Community Tools</h3>
+      <form className="form-grid" onSubmit={handleAdd} style={{ gap: 10, marginBottom: 20 }}>
+        <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Tool name *" />
+        <input value={form.url} onChange={(e) => set('url', e.target.value)} placeholder="Link (https://...) *" />
+        <input value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="Short description (optional)" />
+        <input value={form.sharedBy} onChange={(e) => set('sharedBy', e.target.value)} placeholder="Shared by (optional, e.g. Ansem)" />
+        <button type="submit" className="btn btn-primary btn-sm" style={{ alignSelf: 'flex-start' }}>+ Add Tool</button>
+      </form>
+
+      {tools.length === 0 ? (
+        <p className="small muted">No tools listed yet.</p>
+      ) : (
+        <div className="form-grid" style={{ gap: 10 }}>
+          {tools.map((t) => (
+            <div key={t.id} className="story-meta" style={{ justifyContent: 'space-between', width: '100%' }}>
+              <span>
+                <b>{t.name}</b> — <a href={t.url} target="_blank" rel="noreferrer" className="green small">{t.url}</a>
+                {t.sharedBy && <span className="muted small"> · shared by {t.sharedBy}</span>}
+              </span>
+              <button type="button" className="btn btn-danger btn-sm" onClick={() => removeTool(t.id)}>🗑 Remove</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function AdminDetail({ story, onAction }) {
   const [txHash, setTxHash] = useState('')
   const vouches = MOCK_VOUCHES[story.id] || []
@@ -268,6 +322,8 @@ export default function Admin() {
         <p className="small muted" style={{ marginTop: 10 }}>Click a row to open the full review panel.</p>
 
         {selected && <AdminDetail story={selected} onAction={handleAction} />}
+
+        <ToolsManager />
       </div>
     </div>
   )
