@@ -2,6 +2,25 @@ import { useApp } from '../context/AppContext'
 import { SceneBackdrop } from '../components/BullArt'
 import { usePageTitle } from '../hooks/usePageTitle'
 
+// "Shared by" only becomes a clickable link when it's typed as an X handle
+// (starts with @) — a plain name like "Ansem" just stays as text.
+function SharedBy({ sharedBy }) {
+  if (!sharedBy) return null
+  const isHandle = sharedBy.trim().startsWith('@')
+  return (
+    <p className="small green">
+      Shared by{' '}
+      {isHandle ? (
+        <a href={`https://x.com/${sharedBy.trim().slice(1)}`} target="_blank" rel="noreferrer">
+          {sharedBy.trim()}
+        </a>
+      ) : (
+        sharedBy
+      )}
+    </p>
+  )
+}
+
 export default function CommunityTools() {
   usePageTitle('Community Tools')
   const { tools } = useApp()
@@ -30,7 +49,7 @@ export default function CommunityTools() {
               <div key={t.id} className="card card-hover" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <h3 style={{ fontSize: '1.05rem' }}>{t.name}</h3>
                 {t.description && <p className="small muted">{t.description}</p>}
-                {t.sharedBy && <p className="small green">Shared by {t.sharedBy}</p>}
+                <SharedBy sharedBy={t.sharedBy} />
                 <a href={t.url} target="_blank" rel="noreferrer" className="btn btn-outline btn-sm" style={{ alignSelf: 'flex-start' }}>
                   Open Tool ↗
                 </a>
