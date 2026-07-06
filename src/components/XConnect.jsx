@@ -59,6 +59,10 @@ export function connectX() {
   })
 }
 
+export function disconnectX() {
+  return supabase.auth.signOut()
+}
+
 // Compact version for the navbar (top-right, every page) — same real OAuth
 // session, just no form to snapshot/restore. Lets people connect X once from
 // anywhere on the site; forms pick up the same verified session automatically.
@@ -67,9 +71,14 @@ export function XNavButton() {
   if (loading) return null
 
   return handle ? (
-    <span className="giving-list-pill" title="X account verified">
-      𝕏 {handle}
-    </span>
+    <div className="badge-row" style={{ alignItems: 'center', gap: 10 }}>
+      <span className="giving-list-pill" title="X account verified">
+        𝕏 {handle}
+      </span>
+      <button type="button" className="btn btn-ghost btn-sm" onClick={disconnectX}>
+        Disconnect
+      </button>
+    </div>
   ) : (
     <button type="button" className="btn btn-outline btn-sm" onClick={connectX}>
       𝕏 Connect X

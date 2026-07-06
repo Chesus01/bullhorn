@@ -38,7 +38,7 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 
 body {
   background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
@@ -48,6 +48,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* Layered neon atmosphere: green top-right, Solana purple bottom-left, red ember */
@@ -467,6 +468,17 @@ input, select, textarea { font-family: inherit; }
   border: 2px solid var(--green-neon);
   font-size: 0.95rem;
 }
+.x-connect-btn {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--card);
+  border: 2px solid var(--border-strong);
+  color: var(--muted);
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+.x-connect-btn:hover { border-color: var(--green-neon); color: var(--text); }
 .x-connected-dot {
   position: absolute;
   bottom: -1px; right: -1px;
