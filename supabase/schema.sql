@@ -48,7 +48,8 @@ create table if not exists story_confirmations (
   id uuid primary key default gen_random_uuid(),
   story_id text not null references stories(id) on delete cascade,
   tx_signature text not null unique,
-  amount_sol numeric not null,
+  amount numeric not null,
+  token text not null default 'SOL',
   confirmed_at timestamptz not null default now()
 );
 
@@ -60,4 +61,4 @@ create policy "Anyone can read confirmations"
 
 create policy "Anyone can insert a verified confirmation"
   on story_confirmations for insert
-  with check (length(tx_signature) >= 64 and amount_sol > 0);
+  with check (length(tx_signature) >= 64 and amount > 0);

@@ -1,3 +1,5 @@
+import { ANSEM_TOKEN_MINT } from './config'
+
 export function shortWallet(addr) {
   if (!addr) return '—'
   return addr.length > 12 ? `${addr.slice(0, 4)}…${addr.slice(-4)}` : addr
@@ -113,7 +115,9 @@ export const VERIFICATION_MESSAGE =
 
 // Verifies a pasted transaction signature actually paid the story's wallet,
 // by reading balance deltas straight from the public Solana ledger — never
-// trusts a pasted number, only what the chain confirms.
+// trusts a pasted number, only what the chain confirms. Checks both a native
+// SOL transfer and a direct $ANSEM (SPL token) transfer, since community
+// members might give in either.
 export async function verifyReceivedOnChain(connection, signature, walletAddress) {
   let tx
   try {
@@ -130,20 +134,30 @@ export async function verifyReceivedOnChain(connection, signature, walletAddress
 
   const keys = tx.transaction.message.getAccountKeys().staticAccountKeys
   const idx = keys.findIndex((k) => k.toBase58() === walletAddress)
-  if (idx === -1) {
+
+  if (idx !== -1) {
+    const pre = tx.meta?.preBalances?.[idx]
+    const post = tx.meta?.postBalances?.[idx]
+    if (pre != null && post != null && post - pre > 0) {
+      return { ok: true, amount: (post - pre) / 1e9, token: 'SOL' }
+    }
+  }
+
+  if (ANSEM_TOKEN_MINT) {
+    const preAmount = (tx.meta?.preTokenBalances || [])
+      .find((b) => b.mint === ANSEM_TOKEN_MINT && b.owner === walletAddress)?.uiTokenAmount?.uiAmount || 0
+    const postAmount = (tx.meta?.postTokenBalances || [])
+      .find((b) => b.mint === ANSEM_TOKEN_MINT && b.owner === walletAddress)?.uiTokenAmount?.uiAmount || 0
+    if (postAmount - preAmount > 0) {
+      return { ok: true, amount: postAmount - preAmount, token: 'ANSEM' }
+    }
+  }
+
+  const involvesWallet =
+    idx !== -1 || (tx.meta?.postTokenBalances || []).some((b) => b.owner === walletAddress)
+  if (!involvesWallet) {
     return { ok: false, reason: "This transaction doesn't involve this story's wallet." }
   }
 
-  const pre = tx.meta?.preBalances?.[idx]
-  const post = tx.meta?.postBalances?.[idx]
-  if (pre == null || post == null) {
-    return { ok: false, reason: 'Could not read balances for this transaction.' }
-  }
-
-  const lamports = post - pre
-  if (lamports <= 0) {
-    return { ok: false, reason: "This wallet didn't receive funds in that transaction." }
-  }
-
-  return { ok: true, amountSol: lamports / 1e9 }
+  return { ok: false, reason: "This wallet didn't receive SOL or $ANSEM in that transaction." }
 }

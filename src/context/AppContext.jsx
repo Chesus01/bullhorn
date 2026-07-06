@@ -80,7 +80,8 @@ export function AppProvider({ children }) {
             id: r.id,
             storyId: r.story_id,
             txSignature: r.tx_signature,
-            amountSol: Number(r.amount_sol),
+            amount: Number(r.amount),
+            token: r.token,
             confirmedAt: r.confirmed_at,
           }))
         )
@@ -88,16 +89,16 @@ export function AppProvider({ children }) {
     return () => { cancelled = true }
   }, [])
 
-  const addConfirmation = useCallback(async (storyId, txSignature, amountSol) => {
+  const addConfirmation = useCallback(async (storyId, txSignature, amount, token) => {
     const { data, error } = await supabase
       .from('story_confirmations')
-      .insert({ story_id: storyId, tx_signature: txSignature, amount_sol: amountSol })
+      .insert({ story_id: storyId, tx_signature: txSignature, amount, token })
       .select()
       .single()
     if (!error) {
       setConfirmations((list) => [
         ...list,
-        { id: data.id, storyId, txSignature, amountSol, confirmedAt: data.confirmed_at },
+        { id: data.id, storyId, txSignature, amount, token, confirmedAt: data.confirmed_at },
       ])
     }
     return { error }

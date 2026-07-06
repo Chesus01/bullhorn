@@ -219,7 +219,10 @@ input, select, textarea { font-family: inherit; }
   padding: 28px 20px;
 }
 @media (min-width: 640px) {
-  .stats-bar { grid-template-columns: repeat(4, 1fr); }
+  .stats-bar { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 960px) {
+  .stats-bar { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
 }
 .stats-bar-value {
   font-family: var(--font-display);

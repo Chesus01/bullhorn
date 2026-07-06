@@ -88,7 +88,7 @@ export default function StoryDetail() {
       toast(result.reason, 'error')
       return
     }
-    const { error } = await addConfirmation(story.id, signature, result.amountSol)
+    const { error } = await addConfirmation(story.id, signature, result.amount, result.token)
     if (error) {
       toast(error.code === '23505' ? 'That transaction was already confirmed.' : 'Verified on-chain, but failed to save.', 'error')
       return
@@ -99,7 +99,7 @@ export default function StoryDetail() {
       supportTransactions: [...s.supportTransactions, signature],
     }))
     setTxHash('')
-    toast(`Verified on-chain: ${result.amountSol.toFixed(4)} SOL received 💛`)
+    toast(`Verified on-chain: ${result.amount.toFixed(4)} ${result.token === 'ANSEM' ? '$ANSEM' : 'SOL'} received 💛`)
   }
 
   return (
@@ -229,7 +229,7 @@ export default function StoryDetail() {
                 <p className="small muted">✅ {storyConfirmations.length} confirmed gift{storyConfirmations.length > 1 ? 's' : ''}</p>
                 {storyConfirmations.map((c) => (
                   <a key={c.txSignature} href={solscanTxUrl(c.txSignature)} target="_blank" rel="noreferrer" className="small green">
-                    {c.amountSol.toFixed(4)} SOL · {new Date(c.confirmedAt).toLocaleDateString()} ↗
+                    {c.amount.toFixed(4)} {c.token === 'ANSEM' ? '$ANSEM' : 'SOL'} · {new Date(c.confirmedAt).toLocaleDateString()} ↗
                   </a>
                 ))}
               </div>
