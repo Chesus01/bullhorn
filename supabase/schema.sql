@@ -52,6 +52,53 @@ create policy "Only the site owner can update stories"
   on stories for update
   using (is_site_owner());
 
+-- Lets a creator claim their own story's wallet — but only through this
+-- narrow function, not a general RLS grant. security definer means it runs
+-- with elevated rights internally, so the UPDATE policy above stays
+-- owner-only; this is the one sanctioned exception, and it only ever
+-- touches walletAddress/walletVerified, never the rest of the story.
+create or replace function claim_story_wallet(p_story_id text, p_wallet text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_xhandle text;
+  v_caller text;
+begin
+  select lower(replace(coalesce(data->>'xHandle', ''), '@', '')) into v_xhandle
+  from stories where id = p_story_id;
+
+  if v_xhandle is null or v_xhandle = '' then
+    raise exception 'This story has no X handle to verify against.';
+  end if;
+
+  v_caller := lower(coalesce(
+    auth.jwt() -> 'user_metadata' ->> 'user_name',
+    auth.jwt() -> 'user_metadata' ->> 'preferred_username',
+    ''
+  ));
+
+  if v_caller = '' or v_caller <> v_xhandle then
+    raise exception 'Your connected X account does not match this story.';
+  end if;
+
+  if p_wallet !~ '^[1-9A-HJ-NP-Za-km-z]{32,44}$' then
+    raise exception 'That does not look like a valid Solana wallet address.';
+  end if;
+
+  update stories
+  set data = jsonb_set(
+    jsonb_set(data, '{walletAddress}', to_jsonb(p_wallet)),
+    '{walletVerified}', 'true'
+  )
+  where id = p_story_id;
+end;
+$$;
+
+grant execute on function claim_story_wallet(text, text) to anon, authenticated;
+
 -- Public giving ledger: a recipient pastes a tx signature after receiving
 -- support, the app verifies on-chain that it really paid their wallet (see
 -- verifyReceivedOnChain in src/utils.js), then this row records the proof.

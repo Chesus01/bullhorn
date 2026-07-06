@@ -3,14 +3,76 @@ import { Link, useParams } from 'react-router-dom'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { useApp } from '../context/AppContext'
 import { MOCK_VOUCHES } from '../data/mockData'
-import { shortWallet, solscanUrl, solscanTxUrl, copyText, shareOnXUrl, verifyReceivedOnChain } from '../utils'
+import { shortWallet, solscanUrl, solscanTxUrl, copyText, shareOnXUrl, verifyReceivedOnChain, looksLikeSolanaAddress } from '../utils'
 import Badge, { BadgeRow } from '../components/Badge'
 import { TokenText } from '../components/TokenText'
 import { usePageTitle } from '../hooks/usePageTitle'
 import StoryCard from '../components/StoryCard'
 import DisclaimerBox from '../components/DisclaimerBox'
 import TweetEmbed from '../components/TweetEmbed'
+import { useXSession, connectX } from '../components/XConnect'
 import { SceneBackdrop } from '../components/BullArt'
+
+function ClaimWallet({ story }) {
+  const { claimStoryWallet, toast } = useApp()
+  const { handle, connected, loading } = useXSession()
+  const [wallet, setWallet] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  if (!story.xHandle) {
+    return <p className="small muted">This creator hasn't added a wallet yet — check back soon.</p>
+  }
+  if (loading) return null
+
+  const storyHandle = story.xHandle.replace('@', '').toLowerCase()
+  const isMatch = connected && handle?.replace('@', '').toLowerCase() === storyHandle
+
+  const handleSave = async () => {
+    if (!looksLikeSolanaAddress(wallet)) {
+      toast('Enter a valid Solana wallet address.', 'error')
+      return
+    }
+    setSaving(true)
+    const { error } = await claimStoryWallet(story.id, wallet.trim())
+    setSaving(false)
+    if (error) toast(error.message || 'Could not save — try again.', 'error')
+    else toast('Wallet added! 🎉')
+  }
+
+  if (!connected) {
+    return (
+      <>
+        <p className="small muted" style={{ marginBottom: 12 }}>
+          This creator hasn't added a wallet yet. Is this your story? Connect {story.xHandle} to verify and add it.
+        </p>
+        <button type="button" className="btn btn-primary btn-sm" onClick={connectX}>𝕏 Connect X to Claim</button>
+      </>
+    )
+  }
+
+  if (!isMatch) {
+    return (
+      <p className="small muted">
+        This creator hasn't added a wallet yet. Connected as {handle}, which doesn't match {story.xHandle}.
+      </p>
+    )
+  }
+
+  return (
+    <>
+      <p className="small muted" style={{ marginBottom: 12 }}>Verified as {handle}. Add your Solana wallet:</p>
+      <input
+        value={wallet}
+        onChange={(e) => setWallet(e.target.value)}
+        placeholder="Your Solana wallet address"
+        style={{ width: '100%', background: 'var(--card-2)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 12px', color: 'var(--text)', fontFamily: 'monospace', fontSize: '0.8rem', marginBottom: 10 }}
+      />
+      <button type="button" className="btn btn-green btn-sm" onClick={handleSave} disabled={saving}>
+        {saving ? 'Saving…' : 'Save Wallet'}
+      </button>
+    </>
+  )
+}
 
 function FraudRiskCard({ story }) {
   // Public fraud-risk review — flags risk signals only. Never judges who deserves help.
@@ -213,7 +275,7 @@ export default function StoryDetail() {
                 </p>
               </>
             ) : (
-              <p className="small muted">This creator hasn't added a wallet yet — check back soon.</p>
+              <ClaimWallet story={story} />
             )}
           </div>
 

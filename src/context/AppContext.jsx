@@ -121,6 +121,17 @@ export function AppProvider({ children }) {
     return () => { cancelled = true }
   }, [])
 
+  // Lets a creator claim their own story's wallet by X login, via a
+  // narrow server-side function (see claim_story_wallet in schema.sql) —
+  // not a generic update, so it can't touch anything but the wallet.
+  const claimStoryWallet = useCallback(async (storyId, wallet) => {
+    const { error } = await supabase.rpc('claim_story_wallet', { p_story_id: storyId, p_wallet: wallet })
+    if (!error) {
+      setStories((list) => list.map((s) => (s.id === storyId ? { ...s, walletAddress: wallet, walletVerified: true } : s)))
+    }
+    return { error }
+  }, [])
+
   const addSupporter = useCallback((sup) => {
     const id = `sup${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`
     const full = { ...sup, id }
@@ -206,6 +217,7 @@ export function AppProvider({ children }) {
     givingList,
     confirmations,
     addConfirmation,
+    claimStoryWallet,
     tools,
     addTool,
     removeTool,
