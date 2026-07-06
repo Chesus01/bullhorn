@@ -325,10 +325,18 @@ input, select, textarea { font-family: inherit; }
 .navbar-inner {
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  height: 66px;
+  height: auto;
+  min-height: 66px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  row-gap: 10px;
   gap: 16px;
+}
+@media (min-width: 640px) {
+  .navbar-inner { flex-wrap: nowrap; height: 66px; padding-top: 0; padding-bottom: 0; }
 }
 .nav-logo {
   font-family: var(--font-display);
@@ -349,13 +357,32 @@ input, select, textarea { font-family: inherit; }
   font-weight: 700;
 }
 .nav-center-cta {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  order: 3;
+  width: 100%;
   white-space: nowrap;
 }
+@media (min-width: 640px) {
+  .nav-center-cta {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    order: 0;
+    width: auto;
+  }
+}
 .nav-actions { display: flex; align-items: center; gap: 10px; }
+.buy-banner {
+  display: block;
+  text-align: center;
+  padding: 9px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  background: rgba(57, 255, 20, 0.08);
+  border-bottom: 1px solid var(--border);
+}
+.buy-banner:hover { background: rgba(57, 255, 20, 0.14); }
 .nav-burger {
   display: flex; flex-direction: column; justify-content: center; gap: 5px;
   width: 42px; height: 42px; padding: 0 10px;

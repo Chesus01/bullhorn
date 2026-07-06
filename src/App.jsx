@@ -4,6 +4,7 @@ import { AppProvider } from './context/AppContext'
 import SolanaWalletProvider from './context/SolanaWalletProvider'
 import IntroVideo from './components/IntroVideo'
 import Navbar from './components/Navbar'
+import BuyBanner from './components/BuyBanner'
 import PriceTicker from './components/PriceTicker'
 import Footer from './components/Footer'
 import Toasts from './components/Toasts'
@@ -12,6 +13,7 @@ import SubmitStory from './pages/SubmitStory'
 import BrowseStories from './pages/BrowseStories'
 import CreatorSpotlight from './pages/CreatorSpotlight'
 import Guide from './pages/Guide'
+import HowToBuy from './pages/HowToBuy'
 import StoryDetail from './pages/StoryDetail'
 import GiveBack from './pages/GiveBack'
 import BecomeSupporter from './pages/BecomeSupporter'
@@ -45,11 +47,13 @@ export default function App() {
         <ScrollToTop />
         <PriceTicker />
         <Navbar />
+        <BuyBanner />
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/submit" element={<SubmitStory />} />
             <Route path="/guide" element={<Guide />} />
+            <Route path="/how-to-buy" element={<HowToBuy />} />
             <Route path="/stories" element={<BrowseStories />} />
             <Route path="/spotlight" element={<CreatorSpotlight />} />
             <Route path="/story/:id" element={<StoryDetail />} />
