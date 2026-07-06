@@ -104,11 +104,32 @@ export function AppProvider({ children }) {
     return { error }
   }, [])
 
-  const addSupporter = useCallback((sup) => {
-    const id = `sup${++nextId}`
-    setSupporters((list) => [...list, { ...sup, id }])
-    return id
+  // Supporters live in Supabase too — same reasoning as stories above. A
+  // "Become a Supporter" submission needs to be visible to every visitor,
+  // not just saved in the submitter's own browser.
+  useEffect(() => {
+    let cancelled = false
+    supabase
+      .from('supporters')
+      .select('data')
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (cancelled || error) return
+        if (data) setSupporters(data.map((row) => row.data))
+      })
+    return () => { cancelled = true }
   }, [])
+
+  const addSupporter = useCallback((sup) => {
+    const id = `sup${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`
+    const full = { ...sup, id }
+    setSupporters((list) => [full, ...list])
+    supabase
+      .from('supporters')
+      .insert({ id, data: full })
+      .then(({ error }) => { if (error) toast('Saved locally, but failed to sync to the database.', 'error') })
+    return id
+  }, [toast])
 
   const inGivingList = useCallback(
     (storyId) => givingList.some((g) => g.storyId === storyId),

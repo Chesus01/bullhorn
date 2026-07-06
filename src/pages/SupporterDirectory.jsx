@@ -37,11 +37,19 @@ export default function SupporterDirectory() {
           </div>
         </div>
 
-        <div className="grid-3">
-          {listed.map((s) => (
-            <SupporterCard key={s.id} supporter={s} />
-          ))}
-        </div>
+        {listed.length === 0 ? (
+          <div className="empty-state">
+            <div className="icon">🤝</div>
+            <p><b>No public supporters yet.</b></p>
+            <p className="small">Be the first to join and get discovered as a real giver.</p>
+          </div>
+        ) : (
+          <div className="grid-3">
+            {listed.map((s) => (
+              <SupporterCard key={s.id} supporter={s} />
+            ))}
+          </div>
+        )}
 
         <div className="final-cta" style={{ marginTop: 48 }}>
           <h2 style={{ fontSize: '1.35rem' }}>Want to be on this wall?</h2>

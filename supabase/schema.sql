@@ -62,3 +62,22 @@ create policy "Anyone can read confirmations"
 create policy "Anyone can insert a verified confirmation"
   on story_confirmations for insert
   with check (length(tx_signature) >= 64 and amount > 0);
+
+-- Supporters — same jsonb-blob pattern as stories, so a "Become a Supporter"
+-- submission is actually visible to every visitor instead of only living in
+-- the submitter's own browser tab.
+create table if not exists supporters (
+  id text primary key,
+  created_at timestamptz not null default now(),
+  data jsonb not null
+);
+
+alter table supporters enable row level security;
+
+create policy "Anyone can become a supporter"
+  on supporters for insert
+  with check (true);
+
+create policy "Open read (no admin auth yet)"
+  on supporters for select
+  using (true);
