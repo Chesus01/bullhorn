@@ -16,6 +16,7 @@ import Guide from './pages/Guide'
 import HowToBuy from './pages/HowToBuy'
 import MyStories from './pages/MyStories'
 import CommunityTools from './pages/CommunityTools'
+import CommunityContent from './pages/CommunityContent'
 import StoryDetail from './pages/StoryDetail'
 import GiveBack from './pages/GiveBack'
 import BecomeSupporter from './pages/BecomeSupporter'
@@ -62,6 +63,7 @@ export default function App() {
             <Route path="/how-to-buy" element={<HowToBuy />} />
             <Route path="/my-stories" element={<MyStories />} />
             <Route path="/tools" element={<CommunityTools />} />
+            <Route path="/content" element={<CommunityContent />} />
             <Route
               path="/map"
               element={

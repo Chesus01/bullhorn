@@ -10,6 +10,7 @@ const LINKS = [
   { to: '/spotlight', label: 'Spotlight' },
   { to: '/map', label: 'Community Map' },
   { to: '/tools', label: 'Community Tools' },
+  { to: '/content', label: 'Community Content' },
   { to: '/submit', label: 'Submit Story' },
   { to: '/give-back', label: 'Give Back' },
   { to: '/supporters', label: 'Supporters' },
