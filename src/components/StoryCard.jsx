@@ -47,17 +47,23 @@ export default function StoryCard({ story, compact = false }) {
       <BadgeRow badges={story.badges} max={compact ? 3 : 5} />
 
       <div className="story-actions">
-        <button className="btn btn-outline btn-sm" onClick={handleCopy}>
-          📋 Copy Wallet
-        </button>
-        {!compact && (
-          <a className="btn btn-ghost btn-sm" href={solscanUrl(story.walletAddress)} target="_blank" rel="noreferrer">
-            ↗ Solscan
-          </a>
+        {story.walletAddress ? (
+          <>
+            <button className="btn btn-outline btn-sm" onClick={handleCopy}>
+              📋 Copy Wallet
+            </button>
+            {!compact && (
+              <a className="btn btn-ghost btn-sm" href={solscanUrl(story.walletAddress)} target="_blank" rel="noreferrer">
+                ↗ Solscan
+              </a>
+            )}
+            <button className={`btn btn-sm ${listed ? 'btn-green' : 'btn-outline'}`} onClick={handleList}>
+              {listed ? '✓ On Giving List' : '🎁 Add to Giving List'}
+            </button>
+          </>
+        ) : (
+          <span className="small muted">Wallet not added yet</span>
         )}
-        <button className={`btn btn-sm ${listed ? 'btn-green' : 'btn-outline'}`} onClick={handleList}>
-          {listed ? '✓ On Giving List' : '🎁 Add to Giving List'}
-        </button>
         <Link to={`/story/${story.id}`} className="btn btn-primary btn-sm">
           View Story
         </Link>

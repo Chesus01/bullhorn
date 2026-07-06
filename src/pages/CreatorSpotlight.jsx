@@ -50,10 +50,14 @@ function SpotlightCard({ story, rank }) {
       <BadgeRow badges={story.badges} max={4} />
 
       <div className="story-actions">
-        <button className="btn btn-outline btn-sm" onClick={handleCopy}>📋 Copy Wallet</button>
-        <button className={`btn btn-sm ${listed ? 'btn-green' : 'btn-outline'}`} onClick={handleList}>
-          {listed ? '✓ On Giving List' : '🎁 Add to Giving List'}
-        </button>
+        {story.walletAddress && (
+          <>
+            <button className="btn btn-outline btn-sm" onClick={handleCopy}>📋 Copy Wallet</button>
+            <button className={`btn btn-sm ${listed ? 'btn-green' : 'btn-outline'}`} onClick={handleList}>
+              {listed ? '✓ On Giving List' : '🎁 Add to Giving List'}
+            </button>
+          </>
+        )}
         <Link to={`/story/${story.id}`} className="btn btn-primary btn-sm">View Story</Link>
         <a className="btn btn-ghost btn-sm" href={shareOnXUrl(story)} target="_blank" rel="noreferrer">
           𝕏 Share

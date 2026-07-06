@@ -42,7 +42,7 @@ export default function BrowseStories() {
           s.title.toLowerCase().includes(q) ||
           (s.xHandle || '').toLowerCase().includes(q) ||
           s.category.toLowerCase().includes(q) ||
-          s.walletAddress.toLowerCase().includes(q) ||
+          (s.walletAddress || '').toLowerCase().includes(q) ||
           s.alias.toLowerCase().includes(q)
       )
     }

@@ -186,63 +186,71 @@ export default function StoryDetail() {
         <div className="form-grid">
           <div className="card card-glow">
             <h3 style={{ fontSize: '1rem', marginBottom: 10 }}>👛 Wallet</h3>
-            <p className="wallet-chip" style={{ display: 'block', wordBreak: 'break-all', padding: '10px 12px', marginBottom: 14, fontSize: '0.8rem' }}>
-              {story.walletAddress}
-            </p>
-            <div className="form-grid" style={{ gap: 10 }}>
-              <button className="btn btn-primary btn-block" onClick={handleCopy}>📋 Copy Wallet</button>
-              <a className="btn btn-outline btn-block" href={solscanUrl(story.walletAddress)} target="_blank" rel="noreferrer">
-                ↗ Open in Solscan
-              </a>
-              <button className={`btn btn-block ${listed ? 'btn-green' : 'btn-outline'}`} onClick={handleList}>
-                {listed ? '✓ On Giving List' : '🎁 Add to Giving List'}
-              </button>
-              <a
-                className="btn btn-outline btn-block"
-                href={shareOnXUrl(story)}
-                target="_blank"
-                rel="noreferrer"
-              >
-                𝕏 Share on X
-              </a>
-            </div>
-            <p className="small muted" style={{ marginTop: 14 }}>
-              Always verify the address before sending. Transfers are direct wallet-to-wallet and irreversible.
-            </p>
+            {story.walletAddress ? (
+              <>
+                <p className="wallet-chip" style={{ display: 'block', wordBreak: 'break-all', padding: '10px 12px', marginBottom: 14, fontSize: '0.8rem' }}>
+                  {story.walletAddress}
+                </p>
+                <div className="form-grid" style={{ gap: 10 }}>
+                  <button className="btn btn-primary btn-block" onClick={handleCopy}>📋 Copy Wallet</button>
+                  <a className="btn btn-outline btn-block" href={solscanUrl(story.walletAddress)} target="_blank" rel="noreferrer">
+                    ↗ Open in Solscan
+                  </a>
+                  <button className={`btn btn-block ${listed ? 'btn-green' : 'btn-outline'}`} onClick={handleList}>
+                    {listed ? '✓ On Giving List' : '🎁 Add to Giving List'}
+                  </button>
+                  <a
+                    className="btn btn-outline btn-block"
+                    href={shareOnXUrl(story)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    𝕏 Share on X
+                  </a>
+                </div>
+                <p className="small muted" style={{ marginTop: 14 }}>
+                  Always verify the address before sending. Transfers are direct wallet-to-wallet and irreversible.
+                </p>
+              </>
+            ) : (
+              <p className="small muted">This creator hasn't added a wallet yet — check back soon.</p>
+            )}
           </div>
 
           <FraudRiskCard story={story} />
 
-          <div className="card">
-            <h3 style={{ fontSize: '1rem', marginBottom: 10 }}>💛 Confirm a gift</h3>
-            <p className="small muted" style={{ marginBottom: 12 }}>
-              Paste the transaction signature from a transfer to this wallet. We check it directly
-              against the Solana chain — no self-reported amounts, no trust required.
-            </p>
-            <div className="form-grid" style={{ gap: 10 }}>
-              <input
-                value={txHash}
-                onChange={(e) => setTxHash(e.target.value)}
-                placeholder="Transaction signature"
-                style={{ width: '100%', background: 'var(--card-2)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 12px', color: 'var(--text)', fontFamily: 'monospace', fontSize: '0.8rem' }}
-              />
-              <button className="btn btn-green btn-block" onClick={handleSupported} disabled={verifying}>
-                {verifying ? 'Verifying on-chain…' : 'Verify & Confirm'}
-              </button>
-            </div>
-
-            {storyConfirmations.length > 0 && (
-              <div className="form-grid" style={{ gap: 8, marginTop: 16 }}>
-                <hr className="divider" style={{ margin: '4px 0' }} />
-                <p className="small muted">✅ {storyConfirmations.length} confirmed gift{storyConfirmations.length > 1 ? 's' : ''}</p>
-                {storyConfirmations.map((c) => (
-                  <a key={c.txSignature} href={solscanTxUrl(c.txSignature)} target="_blank" rel="noreferrer" className="small green">
-                    {c.amount.toFixed(4)} {c.token === 'ANSEM' ? '$ANSEM' : 'SOL'} · {new Date(c.confirmedAt).toLocaleDateString()} ↗
-                  </a>
-                ))}
+          {story.walletAddress && (
+            <div className="card">
+              <h3 style={{ fontSize: '1rem', marginBottom: 10 }}>💛 Confirm a gift</h3>
+              <p className="small muted" style={{ marginBottom: 12 }}>
+                Paste the transaction signature from a transfer to this wallet. We check it directly
+                against the Solana chain — no self-reported amounts, no trust required.
+              </p>
+              <div className="form-grid" style={{ gap: 10 }}>
+                <input
+                  value={txHash}
+                  onChange={(e) => setTxHash(e.target.value)}
+                  placeholder="Transaction signature"
+                  style={{ width: '100%', background: 'var(--card-2)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 12px', color: 'var(--text)', fontFamily: 'monospace', fontSize: '0.8rem' }}
+                />
+                <button className="btn btn-green btn-block" onClick={handleSupported} disabled={verifying}>
+                  {verifying ? 'Verifying on-chain…' : 'Verify & Confirm'}
+                </button>
               </div>
-            )}
-          </div>
+
+              {storyConfirmations.length > 0 && (
+                <div className="form-grid" style={{ gap: 8, marginTop: 16 }}>
+                  <hr className="divider" style={{ margin: '4px 0' }} />
+                  <p className="small muted">✅ {storyConfirmations.length} confirmed gift{storyConfirmations.length > 1 ? 's' : ''}</p>
+                  {storyConfirmations.map((c) => (
+                    <a key={c.txSignature} href={solscanTxUrl(c.txSignature)} target="_blank" rel="noreferrer" className="small green">
+                      {c.amount.toFixed(4)} {c.token === 'ANSEM' ? '$ANSEM' : 'SOL'} · {new Date(c.confirmedAt).toLocaleDateString()} ↗
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           <button
             className="btn btn-ghost btn-sm"

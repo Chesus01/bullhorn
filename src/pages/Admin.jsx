@@ -49,8 +49,8 @@ function QuickAddCreator() {
       toast('Name and title are required.', 'error')
       return
     }
-    if (!looksLikeSolanaAddress(form.walletAddress)) {
-      toast('Enter a valid Solana wallet address for this creator.', 'error')
+    if (form.walletAddress.trim() && !looksLikeSolanaAddress(form.walletAddress)) {
+      toast('That wallet address doesn\'t look valid — leave it blank if you don\'t have it yet.', 'error')
       return
     }
     if (!looksLikeXPostUrl(form.featuredPostUrl)) {
@@ -103,7 +103,7 @@ function QuickAddCreator() {
       <form className="form-grid" onSubmit={handleAdd} style={{ gap: 10 }}>
         <input value={form.alias} onChange={(e) => set('alias', e.target.value)} placeholder="Creator name / alias *" />
         <input value={form.xHandle} onChange={(e) => set('xHandle', e.target.value)} placeholder="X handle (optional)" />
-        <input value={form.walletAddress} onChange={(e) => set('walletAddress', e.target.value)} placeholder="Creator's Solana wallet address *" style={{ fontFamily: 'monospace' }} />
+        <input value={form.walletAddress} onChange={(e) => set('walletAddress', e.target.value)} placeholder="Creator's Solana wallet address (optional — add later if needed)" style={{ fontFamily: 'monospace' }} />
         <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Title for their story card *" />
         <input value={form.featuredPostUrl} onChange={(e) => set('featuredPostUrl', e.target.value)} placeholder="Link to their X post *" />
         <div className="checkbox-grid">
@@ -177,6 +177,7 @@ function ToolsManager() {
 function AdminDetail({ story, onAction }) {
   const [txHash, setTxHash] = useState('')
   const [featuredPostUrl, setFeaturedPostUrl] = useState(story.featuredPostUrl || '')
+  const [walletAddress, setWalletAddress] = useState(story.walletAddress || '')
   const vouches = MOCK_VOUCHES[story.id] || []
 
   return (
@@ -233,7 +234,24 @@ function AdminDetail({ story, onAction }) {
           {/* Wallet signals (admin-only) */}
           <div className="card" style={{ background: 'var(--card)' }}>
             <p className="small" style={{ fontWeight: 700, marginBottom: 10 }}>👛 Wallet signals (admin only)</p>
-            <p className="wallet-chip small" style={{ display: 'block', wordBreak: 'break-all', marginBottom: 10 }}>{story.walletAddress}</p>
+            {story.walletAddress ? (
+              <p className="wallet-chip small" style={{ display: 'block', wordBreak: 'break-all', marginBottom: 10 }}>{story.walletAddress}</p>
+            ) : (
+              <p className="small" style={{ color: 'var(--amber)', marginBottom: 10 }}>⚠ No wallet added yet</p>
+            )}
+            <input
+              value={walletAddress}
+              onChange={(e) => setWalletAddress(e.target.value)}
+              placeholder="Add or update Solana wallet address…"
+              style={{ width: '100%', background: 'var(--card-2)', border: '1px solid var(--border)', borderRadius: 10, padding: '9px 12px', color: 'var(--text)', fontFamily: 'monospace', fontSize: '0.78rem', marginBottom: 8 }}
+            />
+            <button
+              className="btn btn-outline btn-sm"
+              style={{ marginBottom: 10 }}
+              onClick={() => onAction('walletAddress', walletAddress.trim())}
+            >
+              Save Wallet Address
+            </button>
             <div className="footer-links small muted">
               <span>Ownership signed: {story.walletSigned ? '✓ Yes' : '✕ No'}</span>
               <span>$ANSEM holder: {story.ansemHolder ? '✓ Yes' : '✕ No'}</span>
@@ -242,7 +260,9 @@ function AdminDetail({ story, onAction }) {
               {story.duplicateRisk >= 60 && <span style={{ color: 'var(--danger)' }}>⚠ Duplicate wallet submission pattern detected</span>}
               {story.walletFreshnessRisk >= 60 && <span style={{ color: 'var(--amber)' }}>⚠ Recently created wallet warning</span>}
             </div>
-            <a className="btn btn-ghost btn-sm" style={{ marginTop: 10 }} href={solscanUrl(story.walletAddress)} target="_blank" rel="noreferrer">↗ Open in Solscan</a>
+            {story.walletAddress && (
+              <a className="btn btn-ghost btn-sm" style={{ marginTop: 10 }} href={solscanUrl(story.walletAddress)} target="_blank" rel="noreferrer">↗ Open in Solscan</a>
+            )}
           </div>
 
           {/* AI review */}
@@ -369,6 +389,12 @@ export default function Admin() {
           break
         }
         updateStory(s.id, { featuredPostUrl: payload || null }); toast(payload ? 'Featured post saved' : 'Featured post cleared'); break
+      case 'walletAddress':
+        if (payload && !looksLikeSolanaAddress(payload)) {
+          toast('That doesn\'t look like a valid Solana wallet address.', 'error')
+          break
+        }
+        updateStory(s.id, { walletAddress: payload }); toast(payload ? 'Wallet address saved' : 'Wallet address cleared'); break
       case 'delete':
         setDeleted((d) => [...d, s.id]); setSelectedId(null); toast('Submission deleted', 'error'); break
       default: break

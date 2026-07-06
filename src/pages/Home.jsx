@@ -51,10 +51,16 @@ function HeroPreviewCard() {
       </div>
       <BadgeRow badges={['Wallet Verified', '$ANSEM Holder', 'Community Vouched']} />
       <div className="story-actions">
-        <button className="btn btn-outline btn-sm" onClick={handleCopy}>📋 Copy Wallet</button>
-        <button className={`btn btn-sm ${inGivingList(featured.id) ? 'btn-green' : 'btn-primary'}`} onClick={handleList}>
-          {inGivingList(featured.id) ? '✓ On Giving List' : '🎁 Add to Giving List'}
-        </button>
+        {featured.walletAddress ? (
+          <>
+            <button className="btn btn-outline btn-sm" onClick={handleCopy}>📋 Copy Wallet</button>
+            <button className={`btn btn-sm ${inGivingList(featured.id) ? 'btn-green' : 'btn-primary'}`} onClick={handleList}>
+              {inGivingList(featured.id) ? '✓ On Giving List' : '🎁 Add to Giving List'}
+            </button>
+          </>
+        ) : (
+          <span className="small muted">Wallet not added yet</span>
+        )}
       </div>
     </div>
   )
