@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import StoryCard from '../components/StoryCard'
+import StatsBar from '../components/StatsBar'
 import { BadgeRow } from '../components/Badge'
 import { ChartLines } from '../components/BullArt'
 import { Ansem, TokenText } from '../components/TokenText'
@@ -116,6 +117,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <StatsBar />
 
       {/* ===== Why this exists ===== */}
       <section className="section">

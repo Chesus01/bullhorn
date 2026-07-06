@@ -211,6 +211,29 @@ input, select, textarea { font-family: inherit; }
 .btn-block { width: 100%; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  text-align: center;
+  padding: 28px 20px;
+}
+@media (min-width: 640px) {
+  .stats-bar { grid-template-columns: repeat(4, 1fr); }
+}
+.stats-bar-value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.9rem;
+  color: var(--green-neon);
+  text-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+}
+.stats-bar-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
 /* ============ Cards ============ */
 .card {
   background: rgba(17, 17, 17, 0.88);
