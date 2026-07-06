@@ -9,6 +9,7 @@ import { TokenText } from '../components/TokenText'
 import { usePageTitle } from '../hooks/usePageTitle'
 import StoryCard from '../components/StoryCard'
 import DisclaimerBox from '../components/DisclaimerBox'
+import TweetEmbed from '../components/TweetEmbed'
 import { SceneBackdrop } from '../components/BullArt'
 
 function FraudRiskCard({ story }) {
@@ -136,6 +137,13 @@ export default function StoryDetail() {
               </>
             )}
           </div>
+
+          {story.featuredPostUrl && (
+            <div className="card">
+              <h3 style={{ fontSize: '1rem', marginBottom: 10 }}>𝕏 Featured post</h3>
+              <TweetEmbed url={story.featuredPostUrl} />
+            </div>
+          )}
 
           {story.proofLinks.length > 0 && (
             <div className="card">

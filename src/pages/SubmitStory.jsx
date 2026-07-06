@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { CATEGORIES, CREATED_OPTIONS } from '../data/mockData'
 import { COUNTRIES } from '../data/countries'
-import { looksLikeSolanaAddress } from '../utils'
+import { looksLikeSolanaAddress, looksLikeXPostUrl } from '../utils'
 import { screenContent } from '../utils/contentFilter'
 import DisclaimerBox from '../components/DisclaimerBox'
 import { CaptchaPlaceholder } from '../components/Placeholders'
@@ -27,6 +27,7 @@ const initialForm = {
   created: [],
   country: '',
   region: '',
+  featuredPostUrl: '',
   proofLinks: '',
   publicNote: '',
   consent: false,
@@ -67,6 +68,9 @@ export default function SubmitStory() {
     if (!form.safety) e.safety = 'Required.'
     if (!form.promo) e.promo = 'Required.'
     if (!form.captcha) e.captcha = 'Please complete the captcha.'
+    if (form.featuredPostUrl.trim() && !looksLikeXPostUrl(form.featuredPostUrl)) {
+      e.featuredPostUrl = 'Paste a link to a specific X post (e.g. x.com/handle/status/123...), not a profile link.'
+    }
     return e
   }
 
@@ -95,6 +99,7 @@ export default function SubmitStory() {
       createdAnything: form.created.length ? form.created : ['None yet'],
       country: form.country || null,
       region: form.region.trim() || null,
+      featuredPostUrl: form.featuredPostUrl.trim() || null,
       badges,
       vouchCount: 0,
       receivedSupport: false,
@@ -243,6 +248,10 @@ export default function SubmitStory() {
           {form.country && field('region', 'State / region (optional)', (
             <input value={form.region} onChange={(e) => set('region', e.target.value)} placeholder="e.g. Texas — leave blank if you'd rather not say" />
           ))}
+
+          {field('featuredPostUrl', 'Feature a specific X post (optional)', (
+            <input value={form.featuredPostUrl} onChange={(e) => set('featuredPostUrl', e.target.value)} placeholder="https://x.com/yourhandle/status/..." />
+          ), 'Got a post about your work you want shown here? Paste the link and we\'ll embed it on your story so supporters see it directly.')}
 
           {field('proofLinks', 'Proof links', (
             <textarea value={form.proofLinks} onChange={(e) => set('proofLinks', e.target.value)} style={{ minHeight: 80 }} placeholder={'One link per line — X profile, GitHub, portfolio, content you made…'} />

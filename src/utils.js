@@ -87,6 +87,12 @@ export function looksLikeSolanaAddress(addr) {
   return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test((addr || '').trim())
 }
 
+// Loose check that a pasted link is a specific X/Twitter post (not just a
+// profile URL) so it's embeddable via TweetEmbed.
+export function looksLikeXPostUrl(url) {
+  return /^https?:\/\/(www\.)?(twitter|x)\.com\/[^/]+\/status\/\d+/i.test((url || '').trim())
+}
+
 // Share a story to the X timeline via the web intent — no login or API needed.
 export function shareOnXUrl(story) {
   // Points at the generated share-card page (see scripts/generate-share-cards.mjs)
