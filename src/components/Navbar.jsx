@@ -8,6 +8,7 @@ const LINKS = [
   { to: '/guide', label: 'Guide' },
   { to: '/stories', label: 'Stories' },
   { to: '/spotlight', label: 'Spotlight' },
+  { to: '/map', label: 'Community Map' },
   { to: '/submit', label: 'Submit Story' },
   { to: '/give-back', label: 'Give Back' },
   { to: '/supporters', label: 'Supporters' },

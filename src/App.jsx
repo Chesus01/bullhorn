@@ -1,5 +1,5 @@
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import { AppProvider } from './context/AppContext'
 import SolanaWalletProvider from './context/SolanaWalletProvider'
 import IntroVideo from './components/IntroVideo'
@@ -23,6 +23,10 @@ import GivingListPage from './pages/GivingListPage'
 import About from './pages/About'
 import Admin from './pages/Admin'
 import NotFound from './pages/NotFound'
+
+// Lazy-loaded: react-globe.gl pulls in three.js, which is heavy — no reason
+// to add that to every visitor's initial bundle when only /map needs it.
+const GlobalMap = lazy(() => import('./pages/GlobalMap'))
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -56,6 +60,14 @@ export default function App() {
             <Route path="/guide" element={<Guide />} />
             <Route path="/how-to-buy" element={<HowToBuy />} />
             <Route path="/my-stories" element={<MyStories />} />
+            <Route
+              path="/map"
+              element={
+                <Suspense fallback={<div className="container section center muted">Loading globe…</div>}>
+                  <GlobalMap />
+                </Suspense>
+              }
+            />
             <Route path="/stories" element={<BrowseStories />} />
             <Route path="/spotlight" element={<CreatorSpotlight />} />
             <Route path="/story/:id" element={<StoryDetail />} />

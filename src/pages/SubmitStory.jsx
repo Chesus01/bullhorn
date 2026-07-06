@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { CATEGORIES, CREATED_OPTIONS } from '../data/mockData'
+import { COUNTRIES } from '../data/countries'
 import { looksLikeSolanaAddress } from '../utils'
 import { screenContent } from '../utils/contentFilter'
 import DisclaimerBox from '../components/DisclaimerBox'
@@ -24,6 +25,8 @@ const initialForm = {
   story: '',
   need: '',
   created: [],
+  country: '',
+  region: '',
   proofLinks: '',
   publicNote: '',
   consent: false,
@@ -90,6 +93,8 @@ export default function SubmitStory() {
       need: form.need.trim(),
       proofLinks: form.proofLinks.split('\n').map((l) => l.trim()).filter(Boolean),
       createdAnything: form.created.length ? form.created : ['None yet'],
+      country: form.country || null,
+      region: form.region.trim() || null,
       badges,
       vouchCount: 0,
       receivedSupport: false,
@@ -227,6 +232,17 @@ export default function SubmitStory() {
               ))}
             </div>
           </div>
+
+          {field('country', 'Country (optional)', (
+            <select value={form.country} onChange={(e) => set('country', e.target.value)}>
+              <option value="">Prefer not to say</option>
+              {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          ), 'Just a general country, never an exact location — shown only as a dot on the community map.')}
+
+          {form.country && field('region', 'State / region (optional)', (
+            <input value={form.region} onChange={(e) => set('region', e.target.value)} placeholder="e.g. Texas — leave blank if you'd rather not say" />
+          ))}
 
           {field('proofLinks', 'Proof links', (
             <textarea value={form.proofLinks} onChange={(e) => set('proofLinks', e.target.value)} style={{ minHeight: 80 }} placeholder={'One link per line — X profile, GitHub, portfolio, content you made…'} />
