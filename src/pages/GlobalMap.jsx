@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Globe from 'react-globe.gl'
 import { useApp } from '../context/AppContext'
+import { SceneBackdrop } from '../components/BullArt'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const COUNTRIES_GEOJSON_URL =
@@ -36,8 +37,10 @@ export default function GlobalMap() {
   useEffect(() => {
     if (globeRef.current) {
       globeRef.current.controls().autoRotate = true
-      globeRef.current.controls().autoRotateSpeed = 0.4
-      globeRef.current.pointOfView({ lat: 20, lng: 0, altitude: 2.4 })
+      globeRef.current.controls().autoRotateSpeed = 0.6
+      // Start pulled back and drift in — a static globe on first load reads as inert.
+      globeRef.current.pointOfView({ lat: 20, lng: 0, altitude: 3.2 })
+      setTimeout(() => globeRef.current?.pointOfView({ lat: 20, lng: 0, altitude: 1.8 }, 1800), 150)
     }
   }, [size])
 
@@ -55,13 +58,14 @@ export default function GlobalMap() {
 
   const colorFor = (feat) => {
     const count = countsByCountry[feat.properties.ADMIN] || 0
-    if (!count) return 'rgba(255,255,255,0.06)'
-    const intensity = 0.25 + 0.65 * (count / maxCount)
+    if (!count) return 'rgba(57, 255, 20, 0.05)'
+    const intensity = 0.3 + 0.6 * (count / maxCount)
     return `rgba(57, 255, 20, ${intensity})`
   }
 
   return (
     <div className="container">
+      <SceneBackdrop src="/scene-supporters.jpg" side="right" opacity={0.2} />
       <div className="page-head">
         <h1>Where the <span className="green">Black Bull</span> lives.</h1>
         <p>
@@ -71,22 +75,26 @@ export default function GlobalMap() {
       </div>
 
       <div className="section" style={{ paddingTop: 24 }}>
-        <div ref={wrapperRef} className="card card-elevated" style={{ padding: 0, overflow: 'hidden', height: 560 }}>
+        <div ref={wrapperRef} className="card card-glow" style={{ padding: 0, overflow: 'hidden', height: 560 }}>
           <Globe
             ref={globeRef}
             width={size.width}
             height={size.height}
             backgroundColor="rgba(0,0,0,0)"
-            globeImageUrl="https://unpkg.com/three-globe/example/img/earth-dark.jpg"
+            backgroundImageUrl="https://unpkg.com/three-globe/example/img/night-sky.png"
+            globeImageUrl="https://unpkg.com/three-globe/example/img/earth-night.jpg"
             bumpImageUrl="https://unpkg.com/three-globe/example/img/earth-topology.png"
+            showAtmosphere
+            atmosphereColor="#39FF14"
+            atmosphereAltitude={0.3}
             polygonsData={countries}
             polygonCapColor={colorFor}
             polygonSideColor={() => 'rgba(0,0,0,0)'}
-            polygonStrokeColor={() => 'rgba(255,255,255,0.15)'}
-            polygonAltitude={(feat) => 0.01 + 0.05 * ((countsByCountry[feat.properties.ADMIN] || 0) / maxCount)}
+            polygonStrokeColor={() => 'rgba(57, 255, 20, 0.25)'}
+            polygonAltitude={(feat) => 0.01 + 0.08 * ((countsByCountry[feat.properties.ADMIN] || 0) / maxCount)}
             polygonLabel={(feat) => {
               const count = countsByCountry[feat.properties.ADMIN] || 0
-              return `<div style="background:#111;padding:6px 10px;border-radius:8px;border:1px solid #333;color:#fff;font-size:12px">
+              return `<div style="background:#111;padding:6px 10px;border-radius:8px;border:1px solid #39FF14;color:#fff;font-size:12px">
                 <b>${feat.properties.ADMIN}</b><br/>${count} ${count === 1 ? 'story' : 'stories'}
               </div>`
             }}
