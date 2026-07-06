@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useApp } from '../context/AppContext'
-import { MOCK_VOUCHES } from '../data/mockData'
-import { shortWallet, solscanUrl, looksLikeXPostUrl } from '../utils'
+import { MOCK_VOUCHES, CREATED_OPTIONS } from '../data/mockData'
+import { shortWallet, solscanUrl, looksLikeXPostUrl, looksLikeSolanaAddress } from '../utils'
 import { BadgeRow, StatusPill, RiskBadge } from '../components/Badge'
 import FilterMenu from '../components/FilterMenu'
 import DisclaimerBox from '../components/DisclaimerBox'
@@ -30,6 +30,94 @@ function suggestedAction(story) {
   if (story.humanConfidence >= 85 && story.communityVouchSignal >= 60) return 'Strong human + vouch signals. Safe to approve or feature.'
   if (story.status === 'pending') return 'Signals look clean. Approve and monitor early vouches.'
   return 'No action needed.'
+}
+
+const QUICK_ADD_INITIAL = {
+  alias: '', xHandle: '', walletAddress: '', title: '', featuredPostUrl: '', created: [],
+}
+
+function QuickAddCreator() {
+  const { addStory, toast } = useApp()
+  const [form, setForm] = useState(QUICK_ADD_INITIAL)
+  const set = (key, value) => setForm((f) => ({ ...f, [key]: value }))
+  const toggleCreated = (opt) =>
+    set('created', form.created.includes(opt) ? form.created.filter((c) => c !== opt) : [...form.created, opt])
+
+  const handleAdd = async (ev) => {
+    ev.preventDefault()
+    if (!form.alias.trim() || !form.title.trim()) {
+      toast('Name and title are required.', 'error')
+      return
+    }
+    if (!looksLikeSolanaAddress(form.walletAddress)) {
+      toast('Enter a valid Solana wallet address for this creator.', 'error')
+      return
+    }
+    if (!looksLikeXPostUrl(form.featuredPostUrl)) {
+      toast('Paste a link to a specific X post (e.g. x.com/handle/status/123...).', 'error')
+      return
+    }
+    addStory({
+      title: form.title.trim(),
+      alias: form.alias.trim(),
+      xHandle: form.xHandle.trim(),
+      walletAddress: form.walletAddress.trim(),
+      category: 'Creator',
+      story: '',
+      need: '',
+      proofLinks: [],
+      createdAnything: form.created.length ? form.created : ['Content'],
+      country: null,
+      region: null,
+      featuredPostUrl: form.featuredPostUrl.trim(),
+      badges: ['Wallet Submitted'],
+      vouchCount: 0,
+      receivedSupport: false,
+      supportTransactions: [],
+      featured: false,
+      status: 'approved',
+      fraudRisk: 'pending',
+      duplicateRisk: 0,
+      spamRisk: 0,
+      walletFreshnessRisk: 0,
+      storyQualitySignal: 0,
+      communityVouchSignal: 0,
+      humanConfidence: 0,
+      ansemHolder: false,
+      walletVerified: false,
+      walletSigned: false,
+      createdAt: new Date().toISOString().slice(0, 10),
+      updatedAt: new Date().toISOString().slice(0, 10),
+    })
+    toast('Creator added — live on Community Content')
+    setForm(QUICK_ADD_INITIAL)
+  }
+
+  return (
+    <div className="card card-elevated" style={{ marginTop: 30 }}>
+      <h3 style={{ marginBottom: 6 }}>🎬 Quick-Add Creator Content</h3>
+      <p className="small muted" style={{ marginBottom: 14 }}>
+        For creators who haven't submitted their own story yet. Shows up instantly on Community
+        Content and the story board, with their post embedded.
+      </p>
+      <form className="form-grid" onSubmit={handleAdd} style={{ gap: 10 }}>
+        <input value={form.alias} onChange={(e) => set('alias', e.target.value)} placeholder="Creator name / alias *" />
+        <input value={form.xHandle} onChange={(e) => set('xHandle', e.target.value)} placeholder="X handle (optional)" />
+        <input value={form.walletAddress} onChange={(e) => set('walletAddress', e.target.value)} placeholder="Creator's Solana wallet address *" style={{ fontFamily: 'monospace' }} />
+        <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Title for their story card *" />
+        <input value={form.featuredPostUrl} onChange={(e) => set('featuredPostUrl', e.target.value)} placeholder="Link to their X post *" />
+        <div className="checkbox-grid">
+          {CREATED_OPTIONS.filter((c) => c !== 'None yet').map((opt) => (
+            <label key={opt} className={`pill-check ${form.created.includes(opt) ? 'checked' : ''}`}>
+              <input type="checkbox" checked={form.created.includes(opt)} onChange={() => toggleCreated(opt)} />
+              {opt}
+            </label>
+          ))}
+        </div>
+        <button type="submit" className="btn btn-primary btn-sm" style={{ alignSelf: 'flex-start' }}>+ Add Creator</button>
+      </form>
+    </div>
+  )
 }
 
 function ToolsManager() {
@@ -377,6 +465,7 @@ export default function Admin() {
 
         {selected && <AdminDetail story={selected} onAction={handleAction} />}
 
+        <QuickAddCreator />
         <ToolsManager />
       </div>
     </div>
