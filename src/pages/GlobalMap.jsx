@@ -65,6 +65,7 @@ export default function GlobalMap() {
 
   return (
     <div className="container">
+      <div className="map-ambient-glow" />
       <SceneBackdrop src="/scene-supporters.jpg" side="right" opacity={0.2} />
       <div className="page-head">
         <h1>Where the <span className="green">Black Bull</span> lives.</h1>
@@ -82,7 +83,7 @@ export default function GlobalMap() {
             height={size.height}
             backgroundColor="rgba(0,0,0,0)"
             backgroundImageUrl="https://unpkg.com/three-globe/example/img/night-sky.png"
-            globeImageUrl="https://unpkg.com/three-globe/example/img/earth-night.jpg"
+            globeImageUrl="https://unpkg.com/three-globe/example/img/earth-dark.jpg"
             bumpImageUrl="https://unpkg.com/three-globe/example/img/earth-topology.png"
             showAtmosphere
             atmosphereColor="#39FF14"
