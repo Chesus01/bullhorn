@@ -35,6 +35,7 @@ export default function BecomeSupporter() {
   const [errors, setErrors] = useState({})
   const [submitted, setSubmitted] = useState(false)
   const [walletVerified, setWalletVerified] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState('')
 
   useEffect(() => {
     const restored = restoreFormSnapshot('become-supporter')
@@ -63,6 +64,7 @@ export default function BecomeSupporter() {
       addSupporter({
         alias: anonymous ? 'Anonymous Supporter' : form.alias.trim(),
         xHandle: anonymous ? null : form.xHandle.trim() || null,
+        avatarUrl: anonymous ? null : avatarUrl || null,
         walletAddress: null, // never expose supporter wallets publicly by default
         supporterType: form.supporterType,
         publicListing: true,
@@ -143,7 +145,7 @@ export default function BecomeSupporter() {
           ), 'Verifying your handle makes your supporter profile far more credible to the community and partners.')}
 
           {form.xHandle.trim() && (
-            <XConnect page="become-supporter" formSnapshot={form} onVerified={(h) => set('xHandle', h)} />
+            <XConnect page="become-supporter" formSnapshot={form} onVerified={(h, a) => { set('xHandle', h); if (a) setAvatarUrl(a) }} />
           )}
 
           {field('walletAddress', 'Solana wallet address', (

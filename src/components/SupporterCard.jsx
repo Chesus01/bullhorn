@@ -1,10 +1,14 @@
 import { BadgeRow } from './Badge'
+import Avatar from './Avatar'
 
 export default function SupporterCard({ supporter }) {
   return (
     <article className="card card-hover story-card">
       <div className="story-card-top">
-        <h3>{supporter.alias}</h3>
+        <div className="story-card-identity">
+          <Avatar url={supporter.avatarUrl} label={supporter.alias || supporter.xHandle} />
+          <h3>{supporter.alias}</h3>
+        </div>
         <span className="category-tag">{supporter.supporterType}</span>
       </div>
 

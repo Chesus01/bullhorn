@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext'
 import { shortWallet, copyText, downloadTextFile, solscanUrl } from '../utils'
 import { BadgeRow } from '../components/Badge'
 import DisclaimerBox from '../components/DisclaimerBox'
+import Avatar from '../components/Avatar'
 import { SceneBackdrop } from '../components/BullArt'
 import { usePageTitle } from '../hooks/usePageTitle'
 
@@ -69,7 +70,10 @@ export default function GivingListPage() {
               {items.map(({ story, note }) => (
                 <div key={story.id} className="card story-card">
                   <div className="story-card-top">
-                    <h3><Link to={`/story/${story.id}`}>{story.title}</Link></h3>
+                    <div className="story-card-identity">
+                      <Avatar url={story.avatarUrl} label={story.alias || story.xHandle} />
+                      <h3><Link to={`/story/${story.id}`}>{story.title}</Link></h3>
+                    </div>
                     <span className="category-tag">{story.category}</span>
                   </div>
                   <div className="story-meta">

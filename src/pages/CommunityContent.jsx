@@ -5,6 +5,7 @@ import { CREATED_OPTIONS } from '../data/mockData'
 import FilterMenu from '../components/FilterMenu'
 import { BadgeRow } from '../components/Badge'
 import TweetEmbed from '../components/TweetEmbed'
+import Avatar from '../components/Avatar'
 import { SceneBackdrop } from '../components/BullArt'
 import { usePageTitle } from '../hooks/usePageTitle'
 
@@ -17,6 +18,7 @@ function ContentCard({ story }) {
   return (
     <article className="card card-hover" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div className="story-meta">
+        <Avatar url={story.avatarUrl} label={story.alias || story.xHandle} size={28} />
         <span>{story.alias}</span>
         {story.xHandle && <span className="green">{story.xHandle}</span>}
         <Link to={`/story/${story.id}`} className="small muted">View story ↗</Link>

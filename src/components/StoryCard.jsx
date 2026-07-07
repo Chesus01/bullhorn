@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext'
 import { shortWallet, solscanUrl, copyText, shareOnXUrl } from '../utils'
 import { BadgeRow } from './Badge'
 import { TokenText } from './TokenText'
+import Avatar from './Avatar'
 
 export default function StoryCard({ story, compact = false }) {
   const { toast, inGivingList, addToGivingList, removeFromGivingList } = useApp()
@@ -29,13 +30,7 @@ export default function StoryCard({ story, compact = false }) {
     <article className="card card-hover story-card">
       <div className="story-card-top">
         <div className="story-card-identity">
-          <span className={`story-avatar ${story.avatarUrl ? 'verified' : ''}`}>
-            {story.avatarUrl ? (
-              <img src={story.avatarUrl} alt="" />
-            ) : (
-              <span className="story-avatar-fallback">{(story.alias || story.xHandle || '?').replace('@', '').charAt(0).toUpperCase()}</span>
-            )}
-          </span>
+          <Avatar url={story.avatarUrl} label={story.alias || story.xHandle} />
           <h3>
             <Link to={`/story/${story.id}`}><TokenText>{story.title}</TokenText></Link>
           </h3>

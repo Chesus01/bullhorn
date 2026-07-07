@@ -8,6 +8,7 @@ import { BadgeRow } from '../components/Badge'
 import { SceneBackdrop } from '../components/BullArt'
 import { TokenText } from '../components/TokenText'
 import DisclaimerBox from '../components/DisclaimerBox'
+import Avatar from '../components/Avatar'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const CONTENT_TYPES = CREATED_OPTIONS.filter((c) => c !== 'None yet')
@@ -33,7 +34,10 @@ function SpotlightCard({ story, rank }) {
         <span className="spotlight-rank">#{rank}</span>
         <span className="category-tag"><TokenText>{story.category}</TokenText></span>
       </div>
-      <h3><Link to={`/story/${story.id}`}><TokenText>{story.title}</TokenText></Link></h3>
+      <div className="story-card-identity">
+        <Avatar url={story.avatarUrl} label={story.alias || story.xHandle} />
+        <h3><Link to={`/story/${story.id}`}><TokenText>{story.title}</TokenText></Link></h3>
+      </div>
 
       <div className="story-meta">
         <span>{story.alias}</span>

@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext'
 import StoryCard from '../components/StoryCard'
 import StatsBar from '../components/StatsBar'
 import { BadgeRow } from '../components/Badge'
+import Avatar from '../components/Avatar'
 import { ChartLines } from '../components/BullArt'
 import { Ansem, TokenText } from '../components/TokenText'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -40,7 +41,10 @@ function HeroPreviewCard() {
     <div className="card card-elevated card-glow story-card">
       <span className="eyebrow" style={{ marginBottom: 4, alignSelf: 'flex-start' }}>★ Featured story</span>
       <div className="story-card-top">
-        <h3><Link to={`/story/${featured.id}`}><TokenText>{featured.title}</TokenText></Link></h3>
+        <div className="story-card-identity">
+          <Avatar url={featured.avatarUrl} label={featured.alias || featured.xHandle} />
+          <h3><Link to={`/story/${featured.id}`}><TokenText>{featured.title}</TokenText></Link></h3>
+        </div>
         <span className="category-tag"><TokenText>{featured.category}</TokenText></span>
       </div>
       <p className="story-preview"><TokenText>{featured.story}</TokenText></p>
@@ -232,7 +236,10 @@ export default function Home() {
             {spotlight.map((s) => (
               <div key={s.id} className="card card-hover story-card">
                 <div className="icon-tile">{s.badges.includes('Builder') ? '🛠' : '🎨'}</div>
-                <h3 style={{ fontSize: '1.02rem' }}><Link to={`/story/${s.id}`}>{s.title}</Link></h3>
+                <div className="story-card-identity">
+                  <Avatar url={s.avatarUrl} label={s.alias || s.xHandle} />
+                  <h3 style={{ fontSize: '1.02rem' }}><Link to={`/story/${s.id}`}>{s.title}</Link></h3>
+                </div>
                 <div className="story-meta">
                   <span>{s.alias}</span>
                   <span className="green">{s.xHandle}</span>

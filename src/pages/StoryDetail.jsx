@@ -12,6 +12,7 @@ import DisclaimerBox from '../components/DisclaimerBox'
 import TweetEmbed from '../components/TweetEmbed'
 import { useXSession, connectX } from '../components/XConnect'
 import { SceneBackdrop } from '../components/BullArt'
+import Avatar from '../components/Avatar'
 
 function ClaimWallet({ story }) {
   const { claimStoryWallet, toast } = useApp()
@@ -174,15 +175,7 @@ export default function StoryDetail() {
           {story.receivedSupport && <Badge label="Received Support" />}
         </div>
         <div className="story-card-identity">
-          <span className={`story-avatar ${story.avatarUrl ? 'verified' : ''}`} style={{ width: 48, height: 48 }}>
-            {story.avatarUrl ? (
-              <img src={story.avatarUrl} alt="" />
-            ) : (
-              <span className="story-avatar-fallback" style={{ fontSize: '1.1rem' }}>
-                {(story.alias || story.xHandle || '?').replace('@', '').charAt(0).toUpperCase()}
-              </span>
-            )}
-          </span>
+          <Avatar url={story.avatarUrl} label={story.alias || story.xHandle} size={48} />
           <h1><TokenText>{story.title}</TokenText></h1>
         </div>
         <div className="story-meta" style={{ marginTop: 10 }}>

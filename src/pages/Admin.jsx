@@ -6,6 +6,7 @@ import { BadgeRow, StatusPill, RiskBadge } from '../components/Badge'
 import FilterMenu from '../components/FilterMenu'
 import DisclaimerBox from '../components/DisclaimerBox'
 import { useXSession, connectX } from '../components/XConnect'
+import Avatar from '../components/Avatar'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 // Must match the is_site_owner() check in supabase/schema.sql — this is
@@ -184,7 +185,10 @@ function AdminDetail({ story, onAction }) {
     <div className="card card-elevated" style={{ marginTop: 20 }}>
       <div className="story-card-top" style={{ marginBottom: 14 }}>
         <div>
-          <h3 style={{ marginBottom: 6 }}>{story.title}</h3>
+          <div className="story-card-identity" style={{ marginBottom: 6 }}>
+            <Avatar url={story.avatarUrl} label={story.alias || story.xHandle} />
+            <h3>{story.title}</h3>
+          </div>
           <div className="story-meta">
             <span>{story.alias}</span>
             {story.xHandle && <span className="green">{story.xHandle}</span>}
@@ -472,7 +476,12 @@ export default function Admin() {
                   onClick={() => setSelectedId(selectedId === s.id ? null : s.id)}
                 >
                   <td style={{ fontWeight: 600, maxWidth: 220 }}>{s.title}</td>
-                  <td>{s.alias}</td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Avatar url={s.avatarUrl} label={s.alias || s.xHandle} size={22} />
+                      {s.alias}
+                    </div>
+                  </td>
                   <td><span className="wallet-chip">{shortWallet(s.walletAddress)}</span></td>
                   <td>{s.category}</td>
                   <td className="green">{s.xHandle || '—'}</td>
