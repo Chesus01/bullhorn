@@ -14,7 +14,7 @@ import { usePageTitle } from '../hooks/usePageTitle'
 const CONTENT_TYPES = CREATED_OPTIONS.filter((c) => c !== 'None yet')
 const TABS = ['All', ...CONTENT_TYPES]
 
-function SpotlightCard({ story, rank }) {
+function SpotlightCard({ story }) {
   const { toast, inGivingList, addToGivingList, removeFromGivingList } = useApp()
   const listed = inGivingList(story.id)
   const madeThings = story.createdAnything.filter((c) => c !== 'None yet')
@@ -30,8 +30,7 @@ function SpotlightCard({ story, rank }) {
 
   return (
     <article className="card card-hover story-card">
-      <div className="story-card-top">
-        <span className="spotlight-rank">#{rank}</span>
+      <div className="story-card-top" style={{ justifyContent: 'flex-end' }}>
         <span className="category-tag"><TokenText>{story.category}</TokenText></span>
       </div>
       <div className="story-card-identity">
@@ -42,7 +41,6 @@ function SpotlightCard({ story, rank }) {
       <div className="story-meta">
         <span>{story.alias}</span>
         {story.xHandle && <span className="green">{story.xHandle}</span>}
-        <span className="vouch-chip">🤝 {story.vouchCount}</span>
       </div>
 
       {madeThings.length > 0 && (
@@ -118,8 +116,8 @@ export default function CreatorSpotlight() {
           </div>
         ) : (
           <div className="grid-3">
-            {ranked.map((s, i) => (
-              <SpotlightCard key={s.id} story={s} rank={i + 1} />
+            {ranked.map((s) => (
+              <SpotlightCard key={s.id} story={s} />
             ))}
           </div>
         )}

@@ -169,6 +169,7 @@ create table if not exists community_tools (
   url text not null,
   description text,
   shared_by text,
+  avatar_url text,
   created_at timestamptz not null default now()
 );
 

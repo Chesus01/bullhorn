@@ -44,7 +44,6 @@ export default function StoryCard({ story, compact = false }) {
         <span>{story.alias}</span>
         {story.xHandle && <span className="green">{story.xHandle}</span>}
         <span className="wallet-chip">{shortWallet(story.walletAddress)}</span>
-        <span className="vouch-chip">🤝 {story.vouchCount}</span>
         {story.receivedSupport && <span style={{ color: 'var(--green)' }}>💛 Supported</span>}
       </div>
 

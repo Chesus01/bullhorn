@@ -123,7 +123,7 @@ function QuickAddCreator() {
 
 function ToolsManager() {
   const { tools, addTool, removeTool, toast } = useApp()
-  const [form, setForm] = useState({ name: '', url: '', description: '', sharedBy: '' })
+  const [form, setForm] = useState({ name: '', url: '', description: '', sharedBy: '', avatarUrl: '' })
   const set = (key, value) => setForm((f) => ({ ...f, [key]: value }))
 
   const handleAdd = async (ev) => {
@@ -137,11 +137,12 @@ function ToolsManager() {
       url: form.url.trim(),
       description: form.description.trim() || null,
       sharedBy: form.sharedBy.trim() || null,
+      avatarUrl: form.avatarUrl.trim() || null,
     })
     if (error) toast('Failed to save tool.', 'error')
     else {
       toast('Tool added')
-      setForm({ name: '', url: '', description: '', sharedBy: '' })
+      setForm({ name: '', url: '', description: '', sharedBy: '', avatarUrl: '' })
     }
   }
 
@@ -153,6 +154,7 @@ function ToolsManager() {
         <input value={form.url} onChange={(e) => set('url', e.target.value)} placeholder="Link (https://...) *" />
         <input value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="Short description (optional)" />
         <input value={form.sharedBy} onChange={(e) => set('sharedBy', e.target.value)} placeholder="Shared by (optional, e.g. Ansem)" />
+        <input value={form.avatarUrl} onChange={(e) => set('avatarUrl', e.target.value)} placeholder="PFP/avatar URL (optional)" />
         <button type="submit" className="btn btn-primary btn-sm" style={{ alignSelf: 'flex-start' }}>+ Add Tool</button>
       </form>
 
@@ -162,7 +164,8 @@ function ToolsManager() {
         <div className="form-grid" style={{ gap: 10 }}>
           {tools.map((t) => (
             <div key={t.id} className="story-meta" style={{ justifyContent: 'space-between', width: '100%' }}>
-              <span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Avatar url={t.avatarUrl} label={t.sharedBy || t.name} size={22} />
                 <b>{t.name}</b> — <a href={t.url} target="_blank" rel="noreferrer" className="green small">{t.url}</a>
                 {t.sharedBy && <span className="muted small"> · shared by {t.sharedBy}</span>}
               </span>

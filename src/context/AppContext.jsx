@@ -165,6 +165,7 @@ export function AppProvider({ children }) {
             url: r.url,
             description: r.description,
             sharedBy: r.shared_by,
+            avatarUrl: r.avatar_url,
             createdAt: r.created_at,
           }))
         )
@@ -175,12 +176,12 @@ export function AppProvider({ children }) {
   const addTool = useCallback(async (tool) => {
     const { data, error } = await supabase
       .from('community_tools')
-      .insert({ name: tool.name, url: tool.url, description: tool.description, shared_by: tool.sharedBy })
+      .insert({ name: tool.name, url: tool.url, description: tool.description, shared_by: tool.sharedBy, avatar_url: tool.avatarUrl })
       .select()
       .single()
     if (!error) {
       setTools((list) => [
-        { id: data.id, name: data.name, url: data.url, description: data.description, sharedBy: data.shared_by, createdAt: data.created_at },
+        { id: data.id, name: data.name, url: data.url, description: data.description, sharedBy: data.shared_by, avatarUrl: data.avatar_url, createdAt: data.created_at },
         ...list,
       ])
     }

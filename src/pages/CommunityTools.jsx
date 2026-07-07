@@ -1,5 +1,6 @@
 import { useApp } from '../context/AppContext'
 import { SceneBackdrop } from '../components/BullArt'
+import Avatar from '../components/Avatar'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 // "Shared by" only becomes a clickable link when it's typed as an X handle
@@ -47,7 +48,10 @@ export default function CommunityTools() {
           <div className="grid-3">
             {tools.map((t) => (
               <div key={t.id} className="card card-hover" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <h3 style={{ fontSize: '1.05rem' }}>{t.name}</h3>
+                <div className="story-card-identity">
+                  <Avatar url={t.avatarUrl} label={t.sharedBy || t.name} />
+                  <h3 style={{ fontSize: '1.05rem' }}>{t.name}</h3>
+                </div>
                 {t.description && <p className="small muted">{t.description}</p>}
                 <SharedBy sharedBy={t.sharedBy} />
                 <a href={t.url} target="_blank" rel="noreferrer" className="btn btn-outline btn-sm" style={{ alignSelf: 'flex-start' }}>

@@ -185,7 +185,6 @@ export default function StoryDetail() {
               {story.xHandle}
             </a>
           )}
-          <span className="vouch-chip">🤝 {story.vouchCount} vouches</span>
           <span className="muted small">Submitted {story.createdAt}</span>
         </div>
       </div>
