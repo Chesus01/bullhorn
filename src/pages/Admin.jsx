@@ -70,7 +70,7 @@ function QuickAddCreator() {
       country: null,
       region: null,
       featuredPostUrl: form.featuredPostUrl.trim(),
-      badges: ['Wallet Submitted'],
+      badges: form.walletAddress.trim() ? ['Wallet Submitted'] : [],
       vouchCount: 0,
       receivedSupport: false,
       supportTransactions: [],
@@ -394,7 +394,13 @@ export default function Admin() {
           toast('That doesn\'t look like a valid Solana wallet address.', 'error')
           break
         }
-        updateStory(s.id, { walletAddress: payload }); toast(payload ? 'Wallet address saved' : 'Wallet address cleared'); break
+        updateStory(s.id, (st) => ({
+          walletAddress: payload,
+          badges: payload
+            ? (st.badges.includes('Wallet Submitted') ? st.badges : [...st.badges, 'Wallet Submitted'])
+            : st.badges.filter((b) => b !== 'Wallet Submitted'),
+        }))
+        toast(payload ? 'Wallet address saved' : 'Wallet address cleared'); break
       case 'delete':
         setDeleted((d) => [...d, s.id]); setSelectedId(null); toast('Submission deleted', 'error'); break
       default: break

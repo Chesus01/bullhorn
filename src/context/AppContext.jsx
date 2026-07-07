@@ -127,7 +127,13 @@ export function AppProvider({ children }) {
   const claimStoryWallet = useCallback(async (storyId, wallet) => {
     const { error } = await supabase.rpc('claim_story_wallet', { p_story_id: storyId, p_wallet: wallet })
     if (!error) {
-      setStories((list) => list.map((s) => (s.id === storyId ? { ...s, walletAddress: wallet, walletVerified: true } : s)))
+      setStories((list) => list.map((s) => {
+        if (s.id !== storyId) return s
+        const badges = new Set(s.badges)
+        badges.add('Wallet Submitted')
+        badges.add('Wallet Verified')
+        return { ...s, walletAddress: wallet, walletVerified: true, badges: [...badges] }
+      }))
     }
     return { error }
   }, [])

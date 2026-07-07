@@ -56,7 +56,7 @@ create policy "Only the site owner can update stories"
 -- narrow function, not a general RLS grant. security definer means it runs
 -- with elevated rights internally, so the UPDATE policy above stays
 -- owner-only; this is the one sanctioned exception, and it only ever
--- touches walletAddress/walletVerified, never the rest of the story.
+-- touches walletAddress/walletVerified/badges, never the rest of the row.
 create or replace function claim_story_wallet(p_story_id text, p_wallet text)
 returns void
 language plpgsql
@@ -90,8 +90,17 @@ begin
 
   update stories
   set data = jsonb_set(
-    jsonb_set(data, '{walletAddress}', to_jsonb(p_wallet)),
-    '{walletVerified}', 'true'
+    jsonb_set(
+      jsonb_set(data, '{walletAddress}', to_jsonb(p_wallet)),
+      '{walletVerified}', 'true'
+    ),
+    '{badges}',
+    (
+      select coalesce(jsonb_agg(distinct b), '[]'::jsonb)
+      from jsonb_array_elements_text(
+        coalesce(data->'badges', '[]'::jsonb) || '["Wallet Submitted", "Wallet Verified"]'::jsonb
+      ) as b
+    )
   )
   where id = p_story_id;
 end;
