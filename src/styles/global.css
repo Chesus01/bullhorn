@@ -649,7 +649,31 @@ input, select, textarea { font-family: inherit; }
 /* ============ Story card ============ */
 .story-card { display: flex; flex-direction: column; gap: 12px; }
 .story-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-.story-card h3 { font-size: 1.06rem; font-weight: 700; }
+.story-card-identity { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.story-card h3 { font-size: 1.06rem; font-weight: 700; min-width: 0; }
+.story-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+}
+.story-avatar img {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-strong);
+}
+.story-avatar.verified img { border-color: var(--green-neon); }
+.story-avatar-fallback {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--card-2);
+  border: 2px solid var(--border-strong);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
 .story-card .category-tag {
   font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
   color: var(--aqua);

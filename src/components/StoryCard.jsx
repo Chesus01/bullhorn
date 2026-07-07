@@ -28,9 +28,18 @@ export default function StoryCard({ story, compact = false }) {
   return (
     <article className="card card-hover story-card">
       <div className="story-card-top">
-        <h3>
-          <Link to={`/story/${story.id}`}><TokenText>{story.title}</TokenText></Link>
-        </h3>
+        <div className="story-card-identity">
+          <span className={`story-avatar ${story.avatarUrl ? 'verified' : ''}`}>
+            {story.avatarUrl ? (
+              <img src={story.avatarUrl} alt="" />
+            ) : (
+              <span className="story-avatar-fallback">{(story.alias || story.xHandle || '?').replace('@', '').charAt(0).toUpperCase()}</span>
+            )}
+          </span>
+          <h3>
+            <Link to={`/story/${story.id}`}><TokenText>{story.title}</TokenText></Link>
+          </h3>
+        </div>
         <span className="category-tag"><TokenText>{story.category}</TokenText></span>
       </div>
 

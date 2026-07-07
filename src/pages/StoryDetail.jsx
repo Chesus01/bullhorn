@@ -15,7 +15,7 @@ import { SceneBackdrop } from '../components/BullArt'
 
 function ClaimWallet({ story }) {
   const { claimStoryWallet, toast } = useApp()
-  const { handle, connected, loading } = useXSession()
+  const { handle, avatarUrl, connected, loading } = useXSession()
   const [wallet, setWallet] = useState('')
   const [saving, setSaving] = useState(false)
 
@@ -33,7 +33,7 @@ function ClaimWallet({ story }) {
       return
     }
     setSaving(true)
-    const { error } = await claimStoryWallet(story.id, wallet.trim())
+    const { error } = await claimStoryWallet(story.id, wallet.trim(), avatarUrl)
     setSaving(false)
     if (error) toast(error.message || 'Could not save — try again.', 'error')
     else toast('Wallet added! 🎉')
@@ -173,7 +173,18 @@ export default function StoryDetail() {
           <span className="category-tag"><TokenText>{story.category}</TokenText></span>
           {story.receivedSupport && <Badge label="Received Support" />}
         </div>
-        <h1><TokenText>{story.title}</TokenText></h1>
+        <div className="story-card-identity">
+          <span className={`story-avatar ${story.avatarUrl ? 'verified' : ''}`} style={{ width: 48, height: 48 }}>
+            {story.avatarUrl ? (
+              <img src={story.avatarUrl} alt="" />
+            ) : (
+              <span className="story-avatar-fallback" style={{ fontSize: '1.1rem' }}>
+                {(story.alias || story.xHandle || '?').replace('@', '').charAt(0).toUpperCase()}
+              </span>
+            )}
+          </span>
+          <h1><TokenText>{story.title}</TokenText></h1>
+        </div>
         <div className="story-meta" style={{ marginTop: 10 }}>
           <span>{story.alias}</span>
           {story.xHandle && (

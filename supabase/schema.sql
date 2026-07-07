@@ -57,7 +57,7 @@ create policy "Only the site owner can update stories"
 -- with elevated rights internally, so the UPDATE policy above stays
 -- owner-only; this is the one sanctioned exception, and it only ever
 -- touches walletAddress/walletVerified/badges, never the rest of the row.
-create or replace function claim_story_wallet(p_story_id text, p_wallet text)
+create or replace function claim_story_wallet(p_story_id text, p_wallet text, p_avatar_url text default null)
 returns void
 language plpgsql
 security definer
@@ -91,7 +91,13 @@ begin
   update stories
   set data = jsonb_set(
     jsonb_set(
-      jsonb_set(data, '{walletAddress}', to_jsonb(p_wallet)),
+      jsonb_set(
+        case when p_avatar_url is not null and p_avatar_url <> ''
+          then jsonb_set(data, '{avatarUrl}', to_jsonb(p_avatar_url))
+          else data
+        end,
+        '{walletAddress}', to_jsonb(p_wallet)
+      ),
       '{walletVerified}', 'true'
     ),
     '{badges}',
@@ -106,7 +112,7 @@ begin
 end;
 $$;
 
-grant execute on function claim_story_wallet(text, text) to anon, authenticated;
+grant execute on function claim_story_wallet(text, text, text) to anon, authenticated;
 
 -- Public giving ledger: a recipient pastes a tx signature after receiving
 -- support, the app verifies on-chain that it really paid their wallet (see

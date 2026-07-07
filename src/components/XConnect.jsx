@@ -87,11 +87,11 @@ export function XNavButton() {
 }
 
 export default function XConnect({ onVerified, formSnapshot, page }) {
-  const { handle, loading, connected } = useXSession()
+  const { handle, avatarUrl, loading, connected } = useXSession()
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (connected) onVerified?.(handle)
+    if (connected) onVerified?.(handle, avatarUrl)
   }, [connected]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const connect = async () => {

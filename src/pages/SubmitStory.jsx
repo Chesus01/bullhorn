@@ -44,6 +44,7 @@ export default function SubmitStory() {
   const [errors, setErrors] = useState({})
   const [walletVerified, setWalletVerified] = useState(false)
   const [ansemHolderVerified, setAnsemHolderVerified] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [heldForReview, setHeldForReview] = useState(false)
 
@@ -91,6 +92,7 @@ export default function SubmitStory() {
       title: form.title.trim(),
       alias: form.alias.trim(),
       xHandle: form.xHandle.trim(),
+      avatarUrl: avatarUrl || null,
       walletAddress: form.walletAddress.trim(),
       category: form.category,
       story: form.story.trim(),
@@ -138,7 +140,7 @@ export default function SubmitStory() {
           </p>
           <div className="hero-ctas" style={{ justifyContent: 'center' }}>
             <Link to="/stories" className="btn btn-primary">Browse Stories</Link>
-            <button className="btn btn-outline" onClick={() => { setForm(initialForm); setWalletVerified(false); setSubmitted(false) }}>
+            <button className="btn btn-outline" onClick={() => { setForm(initialForm); setWalletVerified(false); setAvatarUrl(''); setSubmitted(false) }}>
               Submit another story
             </button>
           </div>
@@ -188,7 +190,7 @@ export default function SubmitStory() {
           ), 'Optional, but it helps supporters verify you are real.')}
 
           {form.xHandle.trim() && (
-            <XConnect page="submit" formSnapshot={form} onVerified={(h) => set('xHandle', h)} />
+            <XConnect page="submit" formSnapshot={form} onVerified={(h, a) => { set('xHandle', h); if (a) setAvatarUrl(a) }} />
           )}
 
           {field('walletAddress', 'Solana wallet address *', (
